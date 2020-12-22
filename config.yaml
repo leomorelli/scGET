@@ -1,0 +1,6 @@
+---
+
+sample: 8_7w_scGETseq
+reads: [1,2,3]
+barcodes: ['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT','CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
+...
