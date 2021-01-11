@@ -19,13 +19,13 @@ rule all:
         expand('{sample}_BC_{barcode}_READ{read}.fq.gz', sample=SAMPLE,read=READS,barcode=BARCODES),  
         expand('{sample}_BC_{barcode}.bam', sample=SAMPLE, barcode=BARCODES),
         expand('{sample}_BC_{barcode}.bam.bai', sample=SAMPLE,barcode=BARCODES),
-        expand('{sample}_BC_{barcode}.bam.lrbc.dedup.bam', sample=SAMPLE,barcode=BARCODES),
+        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=BARCODES),
         expand('{sample}_merged.bam',sample=SAMPLE)
 
 #1a) Classify each read using its barcode
 rule tag_dust:
     input:
-        expand("{sample}_R{read}_10e4.fastq", sample=SAMPLE,read=READS)
+        expand("{sample}_R{read}.fastq", sample=SAMPLE,read=READS)
     params:
         prefix=SAMPLE
     output:
@@ -38,7 +38,7 @@ rule tag_dust:
 #1b) umi_tools
 rule umi_tools:
     input:
-        expand('{sample}_R2_10e4.fastq', sample=SAMPLE)
+        expand('{sample}_R2.fastq', sample=SAMPLE)
     params:
         prefix=SAMPLE,
         method='reads',
@@ -77,7 +77,7 @@ rule bwa:
         lambda wildcards: expand('{sample}_BC_{barcode}_READ1.fq.gz', sample=SAMPLE,barcode=wildcards.barcode),
         lambda wildcards: expand('{sample}_BC_{barcode}_READ3.fq.gz', sample=SAMPLE,barcode=wildcards.barcode)
     params:
-        ids=exp_id(expand('{sample}_R1_10e4.fastq',sample=SAMPLE)[0]),
+        ids=exp_id(expand('{sample}_R1.fastq',sample=SAMPLE)[0]),
         center='COSR',
         platform='Illumina',
         prefix=SAMPLE,
@@ -117,15 +117,15 @@ rule dedup:
         tn=tn_id('{sample}_BC_{barcode}_READ2.fq.gz'),
         prefix=SAMPLE
     output:
-        '{sample}_BC_{barcode}.bam.lrbc.dedup.bam'
+        '{sample}_BC_{barcode}_bcdedup.bam'
     shell:
         'python ~/scatACC/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python ~/scatACC/cbdedup.py -I -o {output}'
 
 #6) merge
 rule merge_bam:
     input:
-        expand('{sample}_BC_{barcode}.bam.lrbc.dedup.bam', sample=SAMPLE,barcode=BARCODES)
+        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=BARCODES)
     output:
         expand('{sample}_merged.bam',sample=SAMPLE)
     shell:
-        'samtools merge {output} {input}'
+        'samtools merge -c -p {output} {input}'
