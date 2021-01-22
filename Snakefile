@@ -3,6 +3,7 @@ configfile: "config.yaml"
 SAMPLE= config['sample']
 READS= config['reads']
 BARCODES=config['barcodes']
+GENOME=config['genome']
 
 #bc_tn5=['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
 #bc_tnh=['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']
@@ -45,7 +46,7 @@ rule umi_tools:
         method='reads',
         extract_method='string',
         bc_pattern='CCCCCCCCCCCCCCCC',
-        cell_number='100', #5000
+        cell_number='100', # it must be 5000
         subset_reads='10000000000'
     output:
         expand('{sample}_whitelist.tsv',sample=SAMPLE) ,
@@ -74,7 +75,7 @@ def exp_id(file):
 
 rule bwa:
     input:
-        '../genome/hg38.fa', 
+        GENOME, 
         lambda wildcards: expand('{sample}_BC_{barcode}_READ1.fq.gz', sample=SAMPLE,barcode=wildcards.barcode),
         lambda wildcards: expand('{sample}_BC_{barcode}_READ3.fq.gz', sample=SAMPLE,barcode=wildcards.barcode)
     params:
@@ -87,7 +88,6 @@ rule bwa:
         '{sample}_BC_{barcode}.bam'
     shell:
         'bwa mem -R "@RG\\tID:{params.ids[0]}_BC\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t 4 {input} |  samtools sort -T {output}_tmp -o {output}'
-
 #4a) indexing allignement
 
 rule index_allignement:
