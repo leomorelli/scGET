@@ -27,13 +27,14 @@ rule tag_dust:
     input:
         expand("{sample}_R{read}.fastq", sample=SAMPLE,read=READS)
     params:
-        prefix=SAMPLE
+        prefix=SAMPLE,
+        list_BCs=",".join(BARCODES)
     output:
         expand("{sample}_logfile.txt", sample=SAMPLE),        
         expand("{sample}_un_READ{read}.fq", sample=SAMPLE,read=READS),        
         expand("{sample}_BC_{barcodes}_READ{read}.fq", sample=SAMPLE, barcodes=BARCODES,read=READS) 
     shell:
-        'tagdust -1 B:TAAGGCGA,GCTACGCT,AGGCTCCG,CTGCGCAT,CGTACTAG,TCCTGAGC,TCATGAGC,CCTGAGAT -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.prefix}'
+        'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.prefix}'
 
 #1b) umi_tools
 rule umi_tools:
@@ -64,12 +65,12 @@ rule compress:
 
 #3a) allignement
 def exp_id(file):
-	f=open(file).read()
-#	f=gzip.open(file,'rb').read() quando userò file gz
-	f=f.split('\n')
-	f1=f[0].split(':')
-	ids=[f1[4],f'{f1[2]}_{f1[4]}']
-	return ids
+    f=open(file).read()
+#   f=gzip.open(file,'rb').read() quando userò file gz
+    f=f.split('\n')
+    f1=f[0].split(':')
+    ids=[f1[4],f'{f1[2]}_{f1[4]}']
+    return ids
 
 rule bwa:
     input:
@@ -102,11 +103,11 @@ def tn_id(file):
     BCs={'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
     bc_in=str(file).split('_')[-2]
     if bc_in in BCs['tn5']:
-    	return 'tn5'        
+        return 'tn5'        
     elif bc_in in BCs['tnh']:
-    	return 'tnh' 
+        return 'tnh' 
     else:
-    	return 'nan'
+        return 'nan'
 
 rule dedup:
     input:
@@ -120,6 +121,7 @@ rule dedup:
         '{sample}_BC_{barcode}_bcdedup.bam'
     shell:
         'python ~/scatACC/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python ~/scatACC/cbdedup.py -I -o {output}'
+
 
 #6) merge
 rule merge_bam:
