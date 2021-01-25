@@ -2,6 +2,6 @@
 
 sample: 8_7w_scGETseq
 reads: [1,2,3]
-barcodes: ['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT','CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
+barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
 genome: ../genome/hg38.fa
 ...

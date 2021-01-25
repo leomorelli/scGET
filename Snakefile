@@ -2,7 +2,8 @@ configfile: "config.yaml"
 
 SAMPLE= config['sample']
 READS= config['reads']
-BARCODES=config['barcodes']
+TN_BARCODES=config['barcodes']
+BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 GENOME=config['genome']
 
 #bc_tn5=['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
@@ -21,7 +22,8 @@ rule all:
         expand('{sample}_BC_{barcode}.bam', sample=SAMPLE, barcode=BARCODES),
         expand('{sample}_BC_{barcode}.bam.bai', sample=SAMPLE,barcode=BARCODES),
         expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=BARCODES),
-        expand('{sample}_merged.bam',sample=SAMPLE)
+        expand('{sample}_tn5_merged.bam',sample=SAMPLE),
+        expand('{sample}_tnh_merged.bam',sample=SAMPLE)
 
 #1a) Classify each read using its barcode
 rule tag_dust:
@@ -121,13 +123,21 @@ rule dedup:
         '{sample}_BC_{barcode}_bcdedup.bam'
     shell:
         'python ~/scatACC/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python ~/scatACC/cbdedup.py -I -o {output}'
-
+        
 
 #6) merge
-rule merge_bam:
+rule merge_bam_tn5:
     input:
-        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=BARCODES)
+        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=TN_BARCODES['tn5'])
     output:
-        expand('{sample}_merged.bam',sample=SAMPLE)
+        expand('{sample}_tn5_merged.bam',sample=SAMPLE)
+    shell:
+        'samtools merge -c -p {output} {input}'
+
+rule merge_bam_tnh:
+    input:
+        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=TN_BARCODES['tnh'])
+    output:
+        expand('{sample}_tnh_merged.bam',sample=SAMPLE)
     shell:
         'samtools merge -c -p {output} {input}'
