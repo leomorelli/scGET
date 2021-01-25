@@ -6,6 +6,7 @@ TN_BARCODES=config['barcodes']
 BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 GENOME=config['genome']
 THREADS=config['threads']
+CELL_NUMBER=config['cell_number']
 
 #bc_tn5=['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
 #bc_tnh=['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']
@@ -50,7 +51,7 @@ rule umi_tools:
         method='reads',
         extract_method='string',
         bc_pattern='CCCCCCCCCCCCCCCC',
-        cell_number='100', # it must be 5000
+        cell_number=CELL_NUMBER, # it must be 5000 i set it at 100
         subset_reads='10000000000'
     output:
         expand('{sample}_whitelist.tsv',sample=SAMPLE) ,
