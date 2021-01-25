@@ -5,6 +5,7 @@ READS= config['reads']
 TN_BARCODES=config['barcodes']
 BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 GENOME=config['genome']
+THREADS=config['threads']
 
 #bc_tn5=['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
 #bc_tnh=['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']
@@ -31,13 +32,14 @@ rule tag_dust:
         expand("{sample}_R{read}.fastq", sample=SAMPLE,read=READS)
     params:
         prefix=SAMPLE,
-        list_BCs=",".join(BARCODES)
+        list_BCs=",".join(BARCODES),
+        threads=THREADS
     output:
         expand("{sample}_logfile.txt", sample=SAMPLE),        
         expand("{sample}_un_READ{read}.fq", sample=SAMPLE,read=READS),        
         expand("{sample}_BC_{barcodes}_READ{read}.fq", sample=SAMPLE, barcodes=BARCODES,read=READS) 
     shell:
-        'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.prefix}'
+        'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.prefix} -t {params.threads}'
 
 #1b) umi_tools
 rule umi_tools:
@@ -85,24 +87,28 @@ rule bwa:
         center='COSR',
         platform='Illumina',
         prefix=SAMPLE,
-        lib='not_specified'
+        lib='not_specified',
+        threads_bwa=THREADS-2,
+        threads_samtools=THREADS-6
     output:
         '{sample}_BC_{barcode}.bam'
     shell:
-        'bwa mem -R "@RG\\tID:{params.ids[0]}_BC\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t 4 {input} |  samtools sort -T {output}_tmp -o {output}'
+        'bwa mem -R "@RG\\tID:{params.ids[0]}_BC\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
 #4a) indexing allignement
 
 rule index_allignement:
     input:
         '{sample}_BC_{barcode}.bam'
+    params:
+        threads=THREADS
     output:
         '{sample}_BC_{barcode}.bam.bai'
     shell:
-        'samtools index {input}'
+        'samtools index -@ {params.threads} {input}'
 
 # 5) deduplication
 def tn_id(file):
-    BCs={'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
+    BCs=TN_BARCODES
     bc_in=str(file).split('_')[-2]
     if bc_in in BCs['tn5']:
         return 'tn5'        
@@ -129,15 +135,19 @@ rule dedup:
 rule merge_bam_tn5:
     input:
         expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=TN_BARCODES['tn5'])
+    params:
+        threads=THREADS
     output:
         expand('{sample}_tn5_merged.bam',sample=SAMPLE)
     shell:
-        'samtools merge -c -p {output} {input}'
+        'samtools merge -c -p -@ {params.threads} {output} {input}'
 
 rule merge_bam_tnh:
     input:
         expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=TN_BARCODES['tnh'])
+    params:
+        threads=THREADS
     output:
         expand('{sample}_tnh_merged.bam',sample=SAMPLE)
     shell:
-        'samtools merge -c -p {output} {input}'
+        'samtools merge -c -p -@ {params.threads} {output} {input}'
