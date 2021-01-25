@@ -1,4 +1,4 @@
-configfile: "config.yaml"
+configfile: 'config.yaml'
 
 SAMPLE= config['sample']
 READS= config['reads']
@@ -13,32 +13,27 @@ CELL_NUMBER=config['cell_number']
 
 
 rule all:
-    input:
-        expand("{sample}_BC_{barcodes}_READ{read}.fq", sample=SAMPLE, barcodes=BARCODES,read=READS),        
-        expand("{sample}_un_READ{read}.fq", sample=SAMPLE,read=READS),        
-        expand("{sample}_logfile.txt", sample=SAMPLE), 
-        expand('{sample}_whitelist.tsv',sample=SAMPLE) ,
+    input:       
+        expand('{sample}_un_READ{read}.fq', sample=SAMPLE,read=READS),        
+        expand('{sample}_logfile.txt', sample=SAMPLE), 
+        expand('{sample}_whitelist.tsv',sample=SAMPLE),
         expand('{sample}_cell_barcode_knee.png',sample=SAMPLE),
         expand('{sample}_cell_barcode_counts.png',sample=SAMPLE),
-        expand('{sample}_BC_{barcode}_READ{read}.fq.gz', sample=SAMPLE,read=READS,barcode=BARCODES),  
-        expand('{sample}_BC_{barcode}.bam', sample=SAMPLE, barcode=BARCODES),
-        expand('{sample}_BC_{barcode}.bam.bai', sample=SAMPLE,barcode=BARCODES),
-        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE,barcode=BARCODES),
         expand('{sample}_tn5_merged.bam',sample=SAMPLE),
         expand('{sample}_tnh_merged.bam',sample=SAMPLE)
 
 #1a) Classify each read using its barcode
 rule tag_dust:
     input:
-        expand("{sample}_R{read}.fastq", sample=SAMPLE,read=READS)
+        expand('{sample}_R{read}.fastq', sample=SAMPLE,read=READS)
     params:
         prefix=SAMPLE,
-        list_BCs=",".join(BARCODES),
+        list_BCs=','.join(BARCODES),
         threads=THREADS
     output:
-        expand("{sample}_logfile.txt", sample=SAMPLE),        
-        expand("{sample}_un_READ{read}.fq", sample=SAMPLE,read=READS),        
-        expand("{sample}_BC_{barcodes}_READ{read}.fq", sample=SAMPLE, barcodes=BARCODES,read=READS) 
+        expand('{sample}_logfile.txt', sample=SAMPLE),        
+        expand('{sample}_un_READ{read}.fq', sample=SAMPLE,read=READS),        
+        expand('{sample}_BC_{barcodes}_READ{read}.fq', sample=SAMPLE, barcodes=BARCODES,read=READS) 
     shell:
         'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.prefix} -t {params.threads}'
 
