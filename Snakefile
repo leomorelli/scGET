@@ -1,3 +1,4 @@
+import gzip
 configfile: 'config.yaml'
 
 SAMPLE= config['sample']
@@ -7,9 +8,6 @@ BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 GENOME=config['genome']
 THREADS=config['threads']
 CELL_NUMBER=config['cell_number']
-
-#bc_tn5=['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT']
-#bc_tnh=['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']
 
 
 rule all:
@@ -25,7 +23,7 @@ rule all:
 #1a) Classify each read using its barcode
 rule tag_dust:
     input:
-        expand('{sample}_R{read}.fastq', sample=SAMPLE,read=READS)
+        expand('{sample}_R{read}.fastq.gz', sample=SAMPLE,read=READS)
     params:
         prefix=SAMPLE,
         list_BCs=','.join(BARCODES),
@@ -40,7 +38,7 @@ rule tag_dust:
 #1b) umi_tools
 rule umi_tools:
     input:
-        expand('{sample}_R2.fastq', sample=SAMPLE)
+        expand('{sample}_R2.fastq.gz', sample=SAMPLE)
     params:
         prefix=SAMPLE,
         method='reads',
@@ -66,8 +64,8 @@ rule compress:
 
 #3a) allignement
 def exp_id(file):
-    f=open(file).read()
-#   f=gzip.open(file,'rb').read() quando userò file gz
+#   f=open(file).read()
+    f=gzip.open(file,'r').read().decode() #quando userò file gz
     f=f.split('\n')
     f1=f[0].split(':')
     ids=[f1[4],f'{f1[2]}_{f1[4]}']
@@ -79,7 +77,7 @@ rule bwa:
         lambda wildcards: expand('{sample}_BC_{barcode}_READ1.fq.gz', sample=SAMPLE,barcode=wildcards.barcode),
         lambda wildcards: expand('{sample}_BC_{barcode}_READ3.fq.gz', sample=SAMPLE,barcode=wildcards.barcode)
     params:
-        ids=exp_id(expand('{sample}_R1.fastq',sample=SAMPLE)[0]),
+        ids=exp_id(expand('{sample}_R1.fastq.gz',sample=SAMPLE)[0]),
         center='COSR',
         platform='Illumina',
         prefix=SAMPLE,
