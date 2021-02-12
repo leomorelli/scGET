@@ -6,4 +6,5 @@ barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA'
 genome: ../genome/hg38.fa
 threads: 8
 cell_number: 5000
+path: ''
 ...
