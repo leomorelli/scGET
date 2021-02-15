@@ -10,12 +10,31 @@ BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 GENOME=config['genome']
 THREADS=config['threads']
 CELL_NUMBER=config['cell_number']
-SAMPLE_PATH=config['path']
+INPUT_PATH=config['input_path']
+OUTPUT_PATH=config['output_path']
+
+def sample_name(string,path):
+    try:
+        if len(string)<1:
+            splt_path=path.split('/')
+            if len(splt_path[-1])<1:
+                sample_name=splt_path[-2]
+                return sample_name
+            else:
+                sample_name=splt_path[-1]
+                return sample_name
+        else:
+            sample_name=string
+            return sample_name
+    except IndexError:
+        return 'scGET_sample'
+
+SAMPLE_NAME=sample_name(SAMPLE,INPUT_PATH)
 
 
 rule all:
     input:              
-        expand('{sample}_{tn}_merged.bam',sample=SAMPLE, tn=TN_BARCODES.keys())
+        expand('{sample}_{tn}_merged.bam',sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 
 # 0) PREMERGE OF DIFFERENT INPUT FILES
@@ -32,9 +51,9 @@ def list_of_files(path):
 
 rule file_read:
     input:
-        files=list_of_files(SAMPLE_PATH)
+        files=list_of_files(INPUT_PATH)
     output:
-        expand('merged_READ{read}.txt', read=READS)
+        expand('info_READ{read}.txt', read=READS)
     script:
         'scripts/get_info.py'
 
@@ -42,9 +61,9 @@ rule file_read:
 #0b) Rename each file with a tag expressing the number of read
 rule merge_reads:
     input:
-        'merged_READ{read}.txt'
+        'info_READ{read}.txt'
     output:
-        'merged_sample_READ{read}.fastq.gz'
+        '{sample}_READ{read}.fastq.gz'
     shell:
         "for F in $(cat {input}) ; do cat $F>>{output}; done"
 
@@ -52,15 +71,15 @@ rule merge_reads:
 #1a) Classify each read using its barcode
 rule tag_dust:
     input:
-        expand('merged_sample_READ{read}.fastq.gz', read=READS)
+        expand('{sample}_READ{read}.fastq.gz', sample=SAMPLE_NAME, read=READS)
     params:
-        prefix='merged_sample',
+        prefix=SAMPLE_NAME,
         list_BCs=','.join(BARCODES),
         threads=THREADS
     output:
-        'merged_sample_logfile.txt',        
-        expand('merged_sample_un_READ{read}.fq', read=READS),        
-        expand('merged_sample_BC_{barcodes}_READ{read}.fq', barcodes=BARCODES,read=READS)
+        expand('{sample}_logfile.txt',sample=SAMPLE_NAME),        
+        expand('{sample}_un_READ{read}.fq', sample=SAMPLE_NAME, read=READS),        
+        expand('{sample}_BC_{barcodes}_READ{read}.fq', sample=SAMPLE_NAME, barcodes=BARCODES,read=READS)
     shell:
         'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.prefix} -t {params.threads}'
 
@@ -68,18 +87,18 @@ rule tag_dust:
 #1b) umi_tools
 rule umi_tools:
     input:
-        'merged_sample_READ2.fastq.gz'
+        '{sample}_READ2.fastq.gz'
     params:
-        prefix='merged_sample',
+        prefix=SAMPLE_NAME,
         method='reads',
         extract_method='string',
         bc_pattern='CCCCCCCCCCCCCCCC',
         cell_number=CELL_NUMBER, # 5000 by default
         subset_reads='10000000000'
     output:
-        'merged_sample_whitelist.tsv',
-        'merged_sample_cell_barcode_knee.png',
-        'merged_sample_cell_barcode_counts.png'
+        '{sample}_whitelist.tsv',
+        '{sample}_cell_barcode_knee.png',
+        '{sample}_cell_barcode_counts.png'
     shell:
         'umi_tools whitelist --method={params.method} --extract-method={params.extract_method} --bc-pattern={params.bc_pattern} -I {input} -S {params.prefix}_whitelist.tsv --plot-prefix={params.prefix} --set-cell-number={params.cell_number} --subset-reads={params.subset_reads}'
 
@@ -87,9 +106,9 @@ rule umi_tools:
 #2a) compress files
 rule compress:
     input:
-        expand('merged_sample_BC_{barcode}_READ{read}.fq', read=READS,barcode=BARCODES)
+        expand('{sample}_BC_{barcode}_READ{read}.fq', sample=SAMPLE_NAME, read=READS,barcode=BARCODES)
     output:
-        expand('merged_sample_BC_{barcode}_READ{read}.fq.gz',read=READS,barcode=BARCODES)
+        expand('{sample}_BC_{barcode}_READ{read}.fq.gz',sample=SAMPLE_NAME, read=READS,barcode=BARCODES)
     shell:
         r'gzip {input} {output}'
 
@@ -101,29 +120,29 @@ def exp_bc(file):
 rule bwa:
     input:
         GENOME, 
-        'merged_sample_BC_{barcode}_READ1.fq.gz',
-        'merged_sample_BC_{barcode}_READ3.fq.gz'
+        '{sample}_BC_{barcode}_READ1.fq.gz',
+        '{sample}_BC_{barcode}_READ3.fq.gz'
     params:
         ids=exp_bc('merged_sample_BC_{barcode}_READ1.fq.gz'),
         center='COSR',
         platform='Illumina',
-        prefix='merged_sample',
+        prefix=SAMPLE_NAME,
         lib='not_specified',
         threads_bwa=THREADS-2,
         threads_samtools=THREADS-6
     output:
-        'merged_sample_BC_{barcode}.bam'
+        '{sample}_BC_{barcode}.bam'
     shell:
         'bwa mem -R "@RG\\tID:BC_{params.ids}\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
 #4a) indexing allignement
 
 rule index_allignement:
     input:
-        'merged_sample_BC_{barcode}.bam'
+        '{sample}_BC_{barcode}.bam'
     params:
         threads=THREADS
     output:
-        'merged_sample_BC_{barcode}.bam.bai'
+        '{sample}_BC_{barcode}.bam.bai'
     shell:
         'samtools index -@ {params.threads} {input}'
 
@@ -141,14 +160,14 @@ def tn_id(file):
 
 rule dedup:
     input:
-        whitelist='merged_sample_whitelist.tsv',
-        read2='merged_sample_BC_{barcode}_READ2.fq.gz',
-        bamfile='merged_sample_BC_{barcode}.bam',
+        whitelist='{sample}_whitelist.tsv',
+        read2='{sample}_BC_{barcode}_READ2.fq.gz',
+        bamfile='{sample}_BC_{barcode}.bam',
     params:
-        tn=tn_id('merged_sample_BC_{barcode}_READ2.fq.gz'),
-        prefix='merged_sample'
+        tn=tn_id('{sample}_BC_{barcode}_READ2.fq.gz'),
+        prefix=SAMPLE_NAME
     output:
-        'merged_sample_BC_{barcode}_bcdedup.bam'
+        '{sample}_BC_{barcode}_bcdedup.bam'
     shell:
         'python ~/scatACC/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python ~/scatACC/cbdedup.py -I -o {output}'
         
@@ -156,20 +175,20 @@ rule dedup:
 #6) merge
 rule merge_bam_tn5:
     input:
-        expand('merged_sample_BC_{barcode}_bcdedup.bam', barcode=TN_BARCODES['tn5'])
+        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE_NAME, barcode=TN_BARCODES['tn5'])
     params:
         threads=THREADS
     output:
-        expand('{sample}_tn5_merged.bam',sample=SAMPLE)
+        expand('{sample}_tn5_merged.bam',sample=SAMPLE_NAME)
     shell:
         'samtools merge -c -p -@ {params.threads} {output} {input}'
 
 rule merge_bam_tnh:
     input:
-        expand('merged_sample_BC_{barcode}_bcdedup.bam', barcode=TN_BARCODES['tnh'])
+        expand('{sample}_BC_{barcode}_bcdedup.bam', sample=SAMPLE_NAME, barcode=TN_BARCODES['tnh'])
     params:
         threads=THREADS
     output:
-        expand('{sample}_tnh_merged.bam',sample=SAMPLE)
+        expand('{sample}_tnh_merged.bam',sample=SAMPLE_NAME)
     shell:
         'samtools merge -c -p -@ {params.threads} {output} {input}'

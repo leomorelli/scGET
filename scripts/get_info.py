@@ -26,7 +26,7 @@ def df_info(true_list):                                           # create a pd 
 def create_read_files(df):                                        # file names of file of the same reads are coupled in a text file
 	for read in [1,2,3]:
 		files=info[info.read==read].index
-		read_file=open(f'merged_READ{read}.txt','w')              # text files are named 'merged_read?.txt'
+		read_file=open(f'info_READ{read}.txt','w')              # text files are named 'merged_read?.txt'
 		for line in files:
 			read_file.write(line)
 			read_file.write('\n')
