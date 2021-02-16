@@ -16,10 +16,9 @@ def filter_files(files_list):                                     # filter only 
 	return true_list
 
 def df_info(true_list):                                           # create a pd dataframe where the lane and the read of each file is clarified
-	info=pd.DataFrame(index=true_list,columns=['lane','read'])    # index of dataframe represents file names. columns are lane and read
+	info=pd.DataFrame(index=true_list,columns=['read'])    # index of dataframe represents file names. columns are lane and read
 	for file in true_list:
 		fin=gzip.open(file,'rb').readline().decode().split(' ')
-		info.loc[file,'lane']=int(fin[0].split(':')[3])
 		info.loc[file,'read']=int(fin[-1][0])
 	return info
 

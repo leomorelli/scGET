@@ -1,0 +1,74 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	8	bwa
+	1	compress
+	8	dedup
+	1	file_read
+	1	merge_bam_tn5
+	1	merge_bam_tnh
+	3	merge_reads
+	1	tag_dust
+	1	umi_tools
+	26
+Select jobs to execute...
+
+[Tue Feb 16 16:28:39 2021]
+rule file_read:
+    input: ../scGET_files/test_multiple_input/prova2_R3.fastq.gz, ../scGET_files/test_multiple_input/prova2_R1.fastq.gz, ../scGET_files/test_multiple_input/prova2_R2.fastq.gz, ../scGET_files/test_multiple_input/prova1_R1.fastq.gz, ../scGET_files/test_multiple_input/prova1_R2.fastq.gz, ../scGET_files/test_multiple_input/tep.fastq.gz, ../scGET_files/test_multiple_input/prova1_R3.fastq.gz
+    output: info_READ1.txt, info_READ2.txt, info_READ3.txt
+    jobid: 5
+
+[Tue Feb 16 16:28:39 2021]
+Finished job 5.
+1 of 26 steps (4%) done
+Select jobs to execute...
+
+[Tue Feb 16 16:28:39 2021]
+rule merge_reads:
+    input: info_READ3.txt
+    output: test_multiple_input_READ3.fastq.gz
+    jobid: 9
+    wildcards: sample=test_multiple_input, read=3
+
+[Tue Feb 16 16:28:39 2021]
+Finished job 9.
+2 of 26 steps (8%) done
+Select jobs to execute...
+
+[Tue Feb 16 16:28:39 2021]
+rule merge_reads:
+    input: info_READ2.txt
+    output: test_multiple_input_READ2.fastq.gz
+    jobid: 4
+    wildcards: sample=test_multiple_input, read=2
+
+[Tue Feb 16 16:28:39 2021]
+Finished job 4.
+3 of 26 steps (12%) done
+Select jobs to execute...
+
+[Tue Feb 16 16:28:39 2021]
+rule umi_tools:
+    input: test_multiple_input_READ2.fastq.gz
+    output: test_multiple_input_whitelist.tsv, test_multiple_input_cell_barcode_knee.png, test_multiple_input_cell_barcode_counts.png
+    jobid: 3
+    wildcards: sample=test_multiple_input
+
+[Tue Feb 16 16:28:40 2021]
+Error in rule umi_tools:
+    jobid: 3
+    output: test_multiple_input_whitelist.tsv, test_multiple_input_cell_barcode_knee.png, test_multiple_input_cell_barcode_counts.png
+    shell:
+        umi_tools whitelist --method=reads --extract-method=string --bc-pattern=CCCCCCCCCCCCCCCC -I test_multiple_input_READ2.fastq.gz -S test_multiple_input_whitelist.tsv --plot-prefix=test_multiple_input --set-cell-number=5000 --subset-reads=10000000000
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job umi_tools since they might be corrupted:
+test_multiple_input_whitelist.tsv
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/morelli/scGET/.snakemake/log/2021-02-16T162839.318125.snakemake.log

@@ -11,7 +11,15 @@ GENOME=config['genome']
 THREADS=config['threads']
 CELL_NUMBER=config['cell_number']
 INPUT_PATH=config['input_path']
-OUTPUT_PATH=config['output_path']
+INPUT_LIST=config['input_list']
+
+def output(path):
+    if path[-1]=='/':
+        return path
+    else:
+        return path+'/'
+
+OUTPUT_PATH=output(config['output_path'])
 
 def sample_name(string,path):
     try:
@@ -39,19 +47,33 @@ rule all:
 
 # 0) PREMERGE OF DIFFERENT INPUT FILES
 # 0a) Create a text file where each file is assigned to its read
-def list_of_files(path):
-    if len(path)<1:
-        return glob.glob('*fastq.gz')
-    else:
-        if path[-1]=='/':
-            return glob.glob(path+'*fastq.gz')
+
+
+def list_of_files(path,file):
+    # no input file (search in directory)
+    if len(file)<1:
+        if len(path)<1:
+            return glob.glob('*fastq.gz')
         else:
-            return glob.glob(path+'/'+'*fastq.gz')
+            if path[-1]=='/':
+                return glob.glob(path+'*fastq.gz')
+            else:
+                return glob.glob(path+'/'+'*fastq.gz')
+    # input: list with file names
+    else:
+        list_input=[fin.strip() for fin in file]
+        if len(path)<1:
+            return list_input
+        else:
+            if path[-1]=='/':
+                return [path+x for x in list_input]
+            else:
+                return [path+'/'+x for x in list_input]
 
 
 rule file_read:
     input:
-        files=list_of_files(INPUT_PATH)
+        files=list_of_files(INPUT_PATH,INPUT_LIST)
     output:
         expand('info_READ{read}.txt', read=READS)
     script:

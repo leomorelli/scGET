@@ -1,0 +1,8 @@
+Building DAG of jobs...
+WorkflowError:
+MissingInputException: Missing input files for rule bwa:
+../genome/hg38.fa
+test_multiple_input_BC_CGTACTAG_bcdedup_READ3.fq.gz
+test_multiple_input_BC_CGTACTAG_bcdedup_READ1.fq.gz
+MissingInputException: Missing input files for rule bwa:
+../genome/hg38.fa
