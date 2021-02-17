@@ -3,7 +3,7 @@
 sample: ''
 reads: [1,2,3]
 barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
-genome: ../genome/hg38.fa
+genome: /home/morelli/scGET_files/genome/hg38.fa
 threads: 8
 cell_number: 5000
 input_path: ''

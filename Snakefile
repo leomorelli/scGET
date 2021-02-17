@@ -1,5 +1,11 @@
 import gzip
 import glob
+import importlib.util
+
+spec = importlib.util.spec_from_file_location("utility_functions", "scripts/utility_functions.py")
+utilities = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(utilities)
+
 
 configfile: 'config.yaml'
 
@@ -12,32 +18,8 @@ THREADS=config['threads']
 CELL_NUMBER=config['cell_number']
 INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
-
-def output(path):
-    if path[-1]=='/':
-        return path
-    else:
-        return path+'/'
-
-OUTPUT_PATH=output(config['output_path'])
-
-def sample_name(string,path):
-    try:
-        if len(string)<1:
-            splt_path=path.split('/')
-            if len(splt_path[-1])<1:
-                sample_name=splt_path[-2]
-                return sample_name
-            else:
-                sample_name=splt_path[-1]
-                return sample_name
-        else:
-            sample_name=string
-            return sample_name
-    except IndexError:
-        return 'scGET_sample'
-
-SAMPLE_NAME=sample_name(SAMPLE,INPUT_PATH)
+OUTPUT_PATH=utilities.output(config['output_path'])
+SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 
 
 rule all:
@@ -48,32 +30,9 @@ rule all:
 # 0) PREMERGE OF DIFFERENT INPUT FILES
 # 0a) Create a text file where each file is assigned to its read
 
-
-def list_of_files(path,file):
-    # no input file (search in directory)
-    if len(file)<1:
-        if len(path)<1:
-            return glob.glob('*fastq.gz')
-        else:
-            if path[-1]=='/':
-                return glob.glob(path+'*fastq.gz')
-            else:
-                return glob.glob(path+'/'+'*fastq.gz')
-    # input: list with file names
-    else:
-        list_input=[fin.strip() for fin in file]
-        if len(path)<1:
-            return list_input
-        else:
-            if path[-1]=='/':
-                return [path+x for x in list_input]
-            else:
-                return [path+'/'+x for x in list_input]
-
-
 rule file_read:
     input:
-        files=list_of_files(INPUT_PATH,INPUT_LIST)
+        files=utilities.list_of_files(INPUT_PATH,INPUT_LIST)
     output:
         expand('info_READ{read}.txt', read=READS)
     script:
@@ -135,17 +94,13 @@ rule compress:
         r'gzip {input} {output}'
 
 #3a) allignement
-def exp_bc(file):
-    bc_in=str(file).split('_')[-2]
-    return bc_in
-
 rule bwa:
     input:
         GENOME, 
         '{sample}_BC_{barcode}_READ1.fq.gz',
         '{sample}_BC_{barcode}_READ3.fq.gz'
     params:
-        ids=exp_bc('merged_sample_BC_{barcode}_READ1.fq.gz'),
+        ids=utilities.exp_bc('merged_sample_BC_{barcode}_READ1.fq.gz'),
         center='COSR',
         platform='Illumina',
         prefix=SAMPLE_NAME,
@@ -171,14 +126,13 @@ rule index_allignement:
 # 5) deduplication
 def tn_id(file):
     BCs=TN_BARCODES
-    bc_in=str(file).split('_')[-2]
+    bc_in=utilities.exp_bc(file)
     if bc_in in BCs['tn5']:
         return 'tn5'        
     elif bc_in in BCs['tnh']:
         return 'tnh' 
     else:
         return 'nan'
-
 
 rule dedup:
     input:
