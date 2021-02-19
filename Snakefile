@@ -13,9 +13,9 @@ SAMPLE= config['sample']
 READS= config['reads']
 TN_BARCODES=config['barcodes']
 BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
-GENOME=config['genome']
+#GENOME=config['genome']
 THREADS=config['threads']
-CELL_NUMBER=config['cell_number']
+#CELL_NUMBER=config['cell_number']
 INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
 OUTPUT_PATH=utilities.output(config['output_path'])
@@ -74,7 +74,7 @@ rule umi_tools:
         method='reads',
         extract_method='string',
         bc_pattern='CCCCCCCCCCCCCCCC',
-        cell_number=CELL_NUMBER, # 5000 by default
+        cell_number=config['cell_number'], # 5000 by default
         subset_reads='10000000000'
     output:
         '{sample}_whitelist.tsv',
@@ -96,7 +96,7 @@ rule compress:
 #3a) allignement
 rule bwa:
     input:
-        GENOME, 
+        config['genome'], 
         '{sample}_BC_{barcode}_READ1.fq.gz',
         '{sample}_BC_{barcode}_READ3.fq.gz'
     params:
@@ -141,11 +141,12 @@ rule dedup:
         bamfile='{sample}_BC_{barcode}.bam',
     params:
         tn=tn_id('{sample}_BC_{barcode}_READ2.fq.gz'),
-        prefix=SAMPLE_NAME
+        prefix=SAMPLE_NAME,
+        scatACC_path=config['scatacc_path']
     output:
         '{sample}_BC_{barcode}_bcdedup.bam'
     shell:
-        'python ~/scatACC/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python ~/scatACC/cbdedup.py -I -o {output}'
+        'python {params.scatACC_path}/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python {params.scatACC_path}/cbdedup.py -I -o {output}'
         
 
 #6) merge
