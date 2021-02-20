@@ -2,13 +2,13 @@ import glob
 
 #adjust path with and without final slash
 def output(path):            
-	if len(path)<1:
-		return path
-	else:
-		if path[-1]=='/':
-			return path
-		else:
-			return path+'/'
+    if len(path)<1:
+        return 'scGET_sample'
+    else:
+        if path[-1]=='/':
+            return path
+        else:
+            return path+'/'
 
 #obtain sample name from sample folder (if a name is not specified)
 def sample_name(string,path):   
@@ -41,25 +41,25 @@ def list_of_files(path,file):
     else:
     # input: list with file names
         if str(file).startswith('['):
-        	list_input=[fin.strip() for fin in file]
-        	if len(path)<1:
-        		return list_input
-        	else:
-        		if path[-1]=='/':
-        			return [path+x for x in list_input]
-        		else:
-        			return [path+'/'+x for x in list_input]
+            list_input=[fin.strip() for fin in file]
+            if len(path)<1:
+                return list_input
+            else:
+                if path[-1]=='/':
+                    return [path+x for x in list_input]
+                else:
+                    return [path+'/'+x for x in list_input]
     # input: string with file names
         else:
-        	prelist=file.split(' ')
-        	list_input=[fin.strip() for fin in prelist]
-        	if len(path)<1:
-        		return list_input
-        	else:
-        		if path[-1]=='/':
-        			return [path+x for x in list_input]
-        		else:
-        			return [path+'/'+x for x in list_input]
+            prelist=file.split(' ')
+            list_input=[fin.strip() for fin in prelist]
+            if len(path)<1:
+                return list_input
+            else:
+                if path[-1]=='/':
+                    return [path+x for x in list_input]
+                else:
+                    return [path+'/'+x for x in list_input]
 
 # obtain the tn barcode for each passed file
 def exp_bc(file):
