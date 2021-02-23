@@ -28,15 +28,15 @@ rule mkdir:
     input:
         OUTPUT_PATH
     shell:
-        'mkdir -p {input}'
+        'mkdir -p {input}/'
 # 0) PREMERGE OF DIFFERENT INPUT FILES
 # 0a) Create a text file where each file is assigned to its read
 
 rule file_read:
     input:
-        files=utilities.list_of_files(INPUT_PATH,INPUT_LIST)
+        files=utilities.list_of_files(INPUT_PATH,INPUT_LIST),
     output:
-        expand('{output}/info_READ{read}.txt',output=OUTPUT_PATH,read=READS)
+        temp(expand('info_READ{read}.txt',output=OUTPUT_PATH,read=READS)),
     script:
         'scripts/get_info.py'
 
@@ -44,7 +44,7 @@ rule file_read:
 #0b) Rename each file with a tag expressing the number of read
 rule merge_reads:
     input:
-        '{output}/info_READ{read}.txt'
+        'info_READ{read}.txt'
     output:
         '{output}/{sample}_READ{read}.fastq.gz'
     shell:

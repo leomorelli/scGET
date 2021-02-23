@@ -6,10 +6,9 @@ def output(path):
         return 'scGET_sample'
     else:
         if path[-1]=='/':
-            return path
+            return path[:-1]
         else:
-            return path+'/'
-
+            return path
 #obtain sample name from sample folder (if a name is not specified)
 def sample_name(string,path):   
     try:
@@ -29,37 +28,55 @@ def sample_name(string,path):
 
 # Generate the list of files with fastq.gz extension present in the input folder
 def list_of_files(path,file):
-    # no input file (search in directory)
-    if len(file)<1:
-        if len(path)<1:
-            return glob.glob('*fastq.gz')
-        else:
-            if path[-1]=='/':
-                return glob.glob(path+'*fastq.gz')
+        # input as a text file
+    if file.split('.')[-1]=='txt':
+        d={'1':[],'2':[],'3':[]}
+        lof=[]
+        fin=open(file).read().split('\n')[:-1]
+        for f in fin:
+            f=f.split(' ')
+            if len(path)<1:
+                d[str(f[-1])].append(path+f[0])
             else:
-                return glob.glob(path+'/'+'*fastq.gz')
+                if path[-1]=='/':
+                    d[str(f[-1])].append(path+f[0])
+                else:
+                    d[str(f[-1])].append(path+'/'+f[0])
+        for i in d:
+            lof.append(d[i])
+        return lof
     else:
-    # input: list with file names
-        if str(file).startswith('['):
-            list_input=[fin.strip() for fin in file]
+        # no input file (search in directory)
+        if len(file)<1:
             if len(path)<1:
-                return list_input
+                return glob.glob('*fastq.gz')
             else:
                 if path[-1]=='/':
-                    return [path+x for x in list_input]
+                    return glob.glob(path+'*fastq.gz')
                 else:
-                    return [path+'/'+x for x in list_input]
-    # input: string with file names
+                    return glob.glob(path+'/'+'*fastq.gz')
         else:
-            prelist=file.split(' ')
-            list_input=[fin.strip() for fin in prelist]
-            if len(path)<1:
-                return list_input
-            else:
-                if path[-1]=='/':
-                    return [path+x for x in list_input]
+        # input: list with file names
+            if str(file).startswith('['):
+                list_input=[fin.strip() for fin in file]
+                if len(path)<1:
+                    return list_input
                 else:
-                    return [path+'/'+x for x in list_input]
+                    if path[-1]=='/':
+                        return [path+x for x in list_input]
+                    else:
+                        return [path+'/'+x for x in list_input]
+        # input: string with file names
+            else:
+                prelist=file.split(' ')
+                list_input=[fin.strip() for fin in prelist]
+                if len(path)<1:
+                    return list_input
+                else:
+                    if path[-1]=='/':
+                        return [path+x for x in list_input]
+                    else:
+                        return [path+'/'+x for x in list_input]
 
 # obtain the tn barcode for each passed file
 def exp_bc(file):
