@@ -16,7 +16,7 @@ BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 THREADS=config['threads']
 INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
-OUTPUT_PATH=utilities.output(config['output_path'])
+OUTPUT_PATH=utilities.output(config['output_path'],config['sample'])
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 
 
@@ -28,7 +28,7 @@ rule mkdir:
     input:
         OUTPUT_PATH
     shell:
-        'mkdir -p {input}/'
+        'mkdir -p {input}'
 # 0) PREMERGE OF DIFFERENT INPUT FILES
 # 0a) Create a text file where each file is assigned to its read
 

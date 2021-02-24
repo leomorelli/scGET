@@ -1,14 +1,14 @@
 import glob
 
 #adjust path with and without final slash
-def output(path):            
+def output(path,sample):            
     if len(path)<1:
-        return 'scGET_sample'
+        return sample
     else:
         if path[-1]=='/':
-            return path[:-1]
+            return path+sample
         else:
-            return path
+            return path+'/'+sample
 #obtain sample name from sample folder (if a name is not specified)
 def sample_name(string,path):   
     try:
