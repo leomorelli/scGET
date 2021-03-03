@@ -143,7 +143,7 @@ rule dedup:
     input:
         whitelist='{output}/{sample}_whitelist.tsv',
         read2='{output}/{sample}_BC_{barcode}_READ2.fq.gz',
-        bamfile='{output}/{sample}_BC_{barcode}.bam',
+        bamfile='{output}/{sample}_BC_{barcode}.bam.bai',
     params:
         tn=tn_id('{sample}_BC_{barcode}_READ2.fq.gz'),
         prefix=SAMPLE_NAME,
