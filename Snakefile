@@ -16,8 +16,9 @@ BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 THREADS=config['threads']
 INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
-OUTPUT_PATH=utilities.output(config['output_path'],config['sample'])
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
+OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
+
 
 
 rule all:
@@ -25,10 +26,10 @@ rule all:
         expand('{output}/{sample}_{tn}_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 rule mkdir:
-    input:
-        OUTPUT_PATH
-    shell:
-        'mkdir -p {input}'
+	input:
+		OUTPUT_PATH
+	shell:
+		'mkdir -p {input}'
 # 0) PREMERGE OF DIFFERENT INPUT FILES
 # 0a) Create a text file where each file is assigned to its read
 
