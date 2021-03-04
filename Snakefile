@@ -1,4 +1,5 @@
 import gzip
+import os
 import glob
 import importlib.util
 
@@ -24,6 +25,20 @@ OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,
 rule all:
     input:              
         expand('{output}/{sample}_{tn}_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
+
+#  create log dir
+path = "logs_slurm"
+try:
+
+    os.mkdir(path)
+
+except OSError:
+
+    print ("Creation of the directory %s failed" % path)
+
+else:
+
+    print ("Successfully created the directory %s " % path)
 
 rule mkdir:
 	input:
@@ -61,6 +76,9 @@ rule tag_dust:
         prefix=SAMPLE_NAME,
         list_BCs=','.join(BARCODES),
         threads=THREADS
+    resources:
+        cpus=8,
+        mem_mb=15000
     output:
         expand('{output}/{sample}_logfile.txt',output=OUTPUT_PATH, sample=SAMPLE_NAME),        
         expand('{output}/{sample}_un_READ{read}.fq',output=OUTPUT_PATH, sample=SAMPLE_NAME, read=READS),        
@@ -81,6 +99,8 @@ rule umi_tools:
         cell_number=config['cell_number'], # 5000 by default
         subset_reads='10000000000',
         output_path=OUTPUT_PATH
+    resources:
+        mem_mb=35000
     output:
         '{output}/{sample}_whitelist.tsv',
         '{output}/{sample}_cell_barcode_knee.png',
@@ -112,6 +132,9 @@ rule bwa:
         lib='not_specified',
         threads_bwa=THREADS-2,
         threads_samtools=THREADS-6
+    resources:
+        cpus=8,
+        mem_mb=30000
     output:
         '{output}/{sample}_BC_{barcode}.bam'
     shell:
@@ -123,6 +146,9 @@ rule index_allignement:
         '{output}/{sample}_BC_{barcode}.bam'
     params:
         threads=THREADS
+    resources:
+        cpus=8,
+        mem_mb=30000
     output:
         '{output}/{sample}_BC_{barcode}.bam.bai'
     shell:
@@ -143,7 +169,10 @@ rule dedup:
     input:
         whitelist='{output}/{sample}_whitelist.tsv',
         read2='{output}/{sample}_BC_{barcode}_READ2.fq.gz',
-        bamfile='{output}/{sample}_BC_{barcode}.bam.bai',
+        bamfile='{output}/{sample}_BC_{barcode}.bam.bai'
+    resources:
+        cpus=8,
+        mem_mb=30000
     params:
         tn=tn_id('{sample}_BC_{barcode}_READ2.fq.gz'),
         prefix=SAMPLE_NAME,
@@ -160,6 +189,9 @@ rule merge_bam_tn5:
         expand('{output}/{sample}_BC_{barcode}_bcdedup.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=TN_BARCODES['tn5'])
     params:
         threads=THREADS
+    resources:
+        cpus=4,
+        mem_mb=15000
     output:
         expand('{output}/{sample}_tn5_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
     shell:
@@ -170,6 +202,9 @@ rule merge_bam_tnh:
         expand('{output}/{sample}_BC_{barcode}_bcdedup.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=TN_BARCODES['tnh'])
     params:
         threads=THREADS
+    resources:
+        cpus=4,
+        mem_mb=15000
     output:
         expand('{output}/{sample}_tnh_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
     shell:
