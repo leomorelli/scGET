@@ -13,22 +13,28 @@ Before getting your hands dirty with scGET analyses, it is necessary to create a
 
 
 1. The conda environment can be automatically generated along with the installation of the majority required packages thanks to the **scget.yaml** file:
-'''conda env create -f scget.yaml
-conda activate scget'''
+
+
+	<conda env create -f scget.yaml>
+	<conda activate scget>
 
 
 2. In order to install 
-'''tar -zxvf tagdust-2.33.tar.gz 
-cd tagdust
-./configure 
-make
-make check
-./src/tagdust
-cp !$ $CONDA_PREFIX/bin'''
+
+
+	<tar -zxvf tagdust-2.33.tar.gz> 
+	<cd tagdust>
+	<./configure> 
+	<make>
+	<make check>
+	<./src/tagdust>
+	<cp !$ $CONDA_PREFIX/bin>
 
 
 3. scatACC
-'''git clone https://github.com/dawe/scatACC'''
+
+
+	<git clone https://github.com/dawe/scatACC>
 
 
 # Set up
