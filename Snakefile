@@ -27,22 +27,22 @@ rule all:
         expand('{output}/{sample}_{tn}_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 #  create log dir
-path = "logs_slurm"
+path = "logs_slurm/"+SAMPLE_NAME
 try:
-
+    os.mkdir("logs_slurm")
     os.mkdir(path)
-
 except OSError:
-
-    print ("Creation of the directory %s failed" % path)
-
+    try:
+        os.mkdir(path)
+        print("Successfully created the directory %s " % path)
+    except OSError:
+        print ("Creation of the directory %s failed" % path)
 else:
-
     print ("Successfully created the directory %s " % path)
 
 rule mkdir:
 	input:
-		OUTPUT_PATH
+		out=OUTPUT_PATH
 	shell:
 		'mkdir -p {input}'
 # 0) PREMERGE OF DIFFERENT INPUT FILES
@@ -152,7 +152,7 @@ rule index_allignement:
     output:
         '{output}/{sample}_BC_{barcode}.bam.bai'
     shell:
-        'samtools index -@ {params.threads} {input}'
+        'samtools index {input}'
 
 # 5) deduplication
 def tn_id(file):
@@ -169,7 +169,8 @@ rule dedup:
     input:
         whitelist='{output}/{sample}_whitelist.tsv',
         read2='{output}/{sample}_BC_{barcode}_READ2.fq.gz',
-        bamfile='{output}/{sample}_BC_{barcode}.bam.bai'
+        bamfile='{output}/{sample}_BC_{barcode}.bam',
+        indexed_bam='{output}/{sample}_BC_{barcode}.bam.bai'
     resources:
         cpus=8,
         mem_mb=30000
