@@ -6,7 +6,29 @@ The workflow for analysis of scGET-generated data is based on the *Snakemake*: a
 
 
  ![dag](dag.svg)
+ 
+ 
 # Installation
+Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda environment. However, some of the packages requires different installation procedures. We designed a 3-step process, allowing an easy and quick environment generation.
+
+
+1. The conda environment can be automatically generated along with the installation of the majority required packages thanks to the **scget.yaml** file:
+'''conda env create -f scget.yaml
+conda activate scget'''
+
+
+2. In order to install 
+'''tar -zxvf tagdust-2.33.tar.gz 
+cd tagdust
+./configure 
+make
+make check
+./src/tagdust
+cp !$ $CONDA_PREFIX/bin'''
+
+
+3. scatACC
+'''git clone https://github.com/dawe/scatACC'''
 
 
 # Set up
