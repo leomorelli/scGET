@@ -13,17 +13,12 @@ Before getting your hands dirty with scGET analyses, it is necessary to create a
 
 
 1. The conda *environment* can be automatically generated, along with the installation of the *majority of required packages* thanks to the **scget.yaml** file:
-
-
 ```
 conda env create -f scget.yaml
 conda activate scget
 ```
-
 2. After having activated the *scget* environment, it is necessary to install the **TagDust** package:
 	1. First, the package must be downloaded and compiled:
-
-
 ```
 tar -zxvf tagdust-2.33.tar.gz 
 cd tagdust
@@ -31,20 +26,12 @@ cd tagdust
 make
 make check
 ```
-
-
 	2. Second, from the *tagdust* directory we can copy the binary tagdust file in our *scget* environment: 
-
-
 ```
 ./src/tagdust
 cp !$ $CONDA_PREFIX/bin
 ```
-
-
 3. The last step accounts for the cloning of **scatACC** repository from github:
-
-
 ```
 git clone https://github.com/dawe/scatACC
 ```
