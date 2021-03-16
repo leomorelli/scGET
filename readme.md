@@ -80,31 +80,31 @@ vi config.yaml
 ```
 Output:
 >sample: ''
-reads: [1,2,3]
-barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
-genome: /home/morelli/scGET_files/genome/hg38.fa
-threads: 8
-cell_number: 5000
-scatacc_path: '/home/scatACC'
-input_path: ''
-input_list: ''
-output_path: ''
+>reads: [1,2,3]
+>barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
+>genome: /home/scGET_files/genome/hg38.fa
+>threads: 8
+>cell_number: 5000
+>scatacc_path: '/home/scatACC'
+>input_path: ''
+>input_list: ''
+>output_path: ''
 
 
-- After that we must modify the field *scatacc_path*, specifying our actual path:
+- After that we must modify the field *scatacc_path*, specifying our **actual scatACC path**:
 
 
 Output:
->>sample: ''
-reads: [1,2,3]
-barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
-genome: /home/scGET_files/genome/hg38.fa
-threads: 8
-cell_number: 5000
-scatacc_path: '/home/**repositories**/scatACC'
-input_path: ''
-input_list: ''
-output_path: ''
+>sample: ''
+>reads: [1,2,3]
+>barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
+>genome: /home/scGET_files/genome/hg38.fa
+>threads: 8
+>cell_number: 5000
+>scatacc_path: '/home/**repositories**/scatACC'
+>input_path: ''
+>input_list: ''
+>output_path: ''
 
 # How to use
 standard input 
