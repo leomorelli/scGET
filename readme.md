@@ -6,10 +6,8 @@ The workflow for analysis of scGET-generated data is based on the *Snakemake*: a
 
 
  ![dag](dag.svg)
- 
- 
-# Installation
-Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda environment. However, some of the packages requires different installation procedures, therefore, we have designed a 3-step process, allowing an easy and quick generation of the *scget environment*.
+# Installing scGET
+Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda environment. However, some of the packages requires different installation procedures. Therefore, we have designed a 3-step process, allowing an easy and quick generation of the *scget environment*.
 
 
 1. The conda *environment* can be automatically generated, along with the installation of the *majority of required packages* thanks to the **scget.yaml** file:
@@ -18,21 +16,43 @@ conda env create -f scget.yaml
 conda activate scget
 ```
 2. After having activated the *scget* environment, it is necessary to install the **TagDust** package. First, the package must be downloaded and compiled; second, from the *tagdust* directory we can copy the binary tagdust file in our *scget* environment: 
+	1. The package must be downloaded and compiled:
 ```
 tar -zxvf tagdust-2.33.tar.gz 
 cd tagdust
 ./configure 
 make
 make check
+```
+
+	2. From the *tagdust* directory we can copy the binary tagdust file in our *scget* environment: 
+```
 cp ./src/tagdust $CONDA_PREFIX/bin
 ```
 3. The last step accounts for the cloning of **scatACC** repository from github:
 ```
 git clone https://github.com/dawe/scatACC
 ```
+In order to perform the analysis through the calculus cluster, it may be useful to check if `screen` package is already installed:
+```
+screen --version
+```
+> Output: Screen version 4.08.00 (GNU) 05-Feb-20
+If `screen` has not been installed yet, it could be easily installed via `sudo`:
+```
+sudo apt update
+sudo apt install screen
+```
 
-
+ 
 # Set up
+scGET workflow is intended to be used 
 
+scatACC path
 
 # How to use
+standard input 
+
+standard output
+
+for more read advanced.md
