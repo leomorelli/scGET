@@ -63,7 +63,48 @@ use-conda: true
 ```
 
 ### scatACC path
+The scGET analysis must **start** from the **scGET directory**. The *scatACC library* is used for one the last step of scGET analysis: therefore, the location of **scatACC directory** must be clarified in order to perform a succesful analysis.
 
+
+*WHERE SHOULD I CLARIFY THE PATH FOR SCATACC DIRECTORY?*
+
+
+Let's exemplify! 
+
+
+Assuming that the **scGET** directory is located in our **home** directory (*/home/scGET*), while our **scatACC** directory is situated in a directory called *repositories* (*/home/repositories/scatACC*):
+- We should open the *config.yaml* file present in **scGET** directory:
+```
+cd /home/scGET
+vi config.yaml
+```
+Output:
+>sample: ''
+reads: [1,2,3]
+barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
+genome: /home/morelli/scGET_files/genome/hg38.fa
+threads: 8
+cell_number: 5000
+scatacc_path: '/home/scatACC'
+input_path: ''
+input_list: ''
+output_path: ''
+
+
+- After that we must modify the field *scatacc_path*, specifying our actual path:
+
+
+Output:
+>>sample: ''
+reads: [1,2,3]
+barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
+genome: /home/scGET_files/genome/hg38.fa
+threads: 8
+cell_number: 5000
+scatacc_path: '/home/**repositories**/scatACC'
+input_path: ''
+input_list: ''
+output_path: ''
 
 # How to use
 standard input 
