@@ -26,6 +26,8 @@ make check
 ```
 
 	2. From the *tagdust* directory we can copy the binary tagdust file in our *scget* environment: 
+	
+	
 ```
 cp ./src/tagdust $CONDA_PREFIX/bin
 ```
@@ -38,6 +40,8 @@ In order to perform the analysis through the calculus cluster, it may be useful 
 screen --version
 ```
 > Output: Screen version 4.08.00 (GNU) 05-Feb-20
+
+
 If `screen` has not been installed yet, it could be easily installed via `sudo`:
 ```
 sudo apt update
