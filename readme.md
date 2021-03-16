@@ -44,13 +44,26 @@ sudo apt install screen
 
  
 # Set up
-Before starting using scGET
+Finally, there are two small tricks left to perform, before you can finally use scGET.
 
 
 ### Cluster set up
-scGET workflow is intended to be used with the support of a calculus cluster, therefore
+ - In your home directory check if you have a snakemake folder inside ``~/.config``. Inside this folder create a slurm folder add in a *config.yaml* file:
+```
+mkdir -p /home/.config/snakemake/slurm
+vi /home/.config/snakemake/slurm/config.yaml
+```
+ - compile the *config.yaml* file with the content specified below (remember to update the queue name specified by the ``-p`` option and  your ``mail-user``):
+```
+jobs: 34
+cluster: "sbatch --mem={resources.mem_mb} -c {resources.cpus} -o logs_slurm/{SAMPLE_NAME}/{rule}_{wildcards} -e logs_slurm/{SAMPLE_NAME}/{rule}_{wildcards} --mail-type=FAIL --mail-user=user.mail@hsr.it"
+default-resources: [cpus=1, mem_mb=2000]
+resources: [cpus=10, mem_mb=50000]
+use-conda: true
+```
 
 ### scatACC path
+
 
 # How to use
 standard input 
