@@ -190,7 +190,7 @@ Example: *output files* are stored in ``home/scGET/experiment_test``
 - **Log files**: log files generated during the analysis, describing each step if the workflow:
 
 
-Example: *log files files* are stored in ``home/scGET/logs_slurm/experiment_test``
+Example: *log files* are stored in ``home/scGET/logs_slurm/experiment_test``
 
 
 
