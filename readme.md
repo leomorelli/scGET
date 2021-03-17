@@ -1,4 +1,4 @@
-# scGET
+# 1. scGET
 **s**ingle **c**ell **G**enome and **E**pigenome by **T**ransposases sequencing (**scGET**-seq) aims to discriminate between open accessible chormatin regions and closed compacted chromatin regions within each single cell, taking advantage of two different transposases: transposase-5 binds to *accessible chromatin* (**tn5**) and transposase-H, a chimeric form of tn5 (**tnH**), which binds *compacted chromatin*.
 
 
@@ -6,7 +6,7 @@ The workflow for analysis of scGET-generated data is based on the *Snakemake*: a
 
 
  ![dag](dag.svg)
-# Installing scGET
+# 2. Installing scGET
 Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda environment. However, some of the packages requires different installation procedures. Therefore, we have designed a 3-step process, allowing an easy and quick generation of the *scget environment*.
 
 
@@ -43,11 +43,11 @@ sudo apt install screen
 ```
 
  
-# Set up
-Finally, there are two small tricks left to perform, before you can finally use scGET.
+# 3. Set up
+Finally, there are three small tricks left to perform, before you can finally use scGET.
 
 
-### Cluster set up
+### a. Cluster set up
  - In your home directory check if you have a snakemake folder inside ``~/.config``. Inside this folder create a slurm folder add in a *config.yaml* file:
 ```
 mkdir -p /home/.config/snakemake/slurm
@@ -62,8 +62,8 @@ resources: [cpus=10, mem_mb=50000]
 use-conda: true
 ```
 
-### scatACC path
-The scGET analysis must **start** from the **scGET directory**. The *scatACC library* is used for one the last step of scGET analysis: therefore, the location of **scatACC directory** must be clarified in order to perform a succesful analysis.
+### b. scatACC path & genome path
+The scGET analysis must **start** from the **scGET directory**. The *scatACC library* is used for one the last step of scGET analysis as well as the *genome file*: therefore, the location of **scatACC directory** and the path for the **genome** must be clarified in order to perform a succesful analysis.
 
 
 *WHERE SHOULD I CLARIFY THE PATH FOR SCATACC DIRECTORY?*
@@ -72,8 +72,8 @@ The scGET analysis must **start** from the **scGET directory**. The *scatACC lib
 Let's exemplify! 
 
 
-Assuming that the **scGET** directory is located in our **home** directory (*/home/scGET*), while our **scatACC** directory is situated in a directory called *repositories* (*/home/repositories/scatACC*):
-- We should open the *config.yaml* file present in **scGET** directory:
+Let's assume that the **scGET** directory is located in our **home** directory (*/home/scGET*); while our **scatACC** directory is situated in a directory called *repositories* (*/home/repositories/scatACC*); on the other hand, the **genome**  file, which we have named *hg38.fa*, lays in the *references* directory (*/home/references/hg.38*):
+- First, we should open the *config.yaml* file present in **scGET** directory:
 ```
 cd /home/scGET
 vi config.yaml
@@ -85,7 +85,7 @@ Output:
 >
 >barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
 >
->genome: /home/scGET_files/genome/hg38.fa
+>genome: /home/genome.fa
 >
 >threads: 8
 >
@@ -100,7 +100,7 @@ Output:
 >output_path: ''
 
 
-- After that we must modify the field *scatacc_path*, specifying our **actual scatACC path**:
+- After that, we must modify the field *scatacc_path*, specifying our **actual scatACC path**, as well as the field *genome*, clarifying the **genome path** with the **genome file name**:
 
 
 Output:
@@ -110,7 +110,7 @@ Output:
 >
 >barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
 >
->genome: /home/scGET_files/genome/hg38.fa
+>genome: /home/**references**/**hg38.fa**
 >
 >threads: 8
 >
@@ -123,9 +123,25 @@ Output:
 >input_list: ''
 >
 >output_path: ''
-# How to use
-standard input 
 
-standard output
 
-for more read advanced.md
+**N.B. the REFERENCE GENOME must be INDEXED before the analysis**
+
+
+If the genome has not been indexed yet, you can make up for it in three steps:
+- Activate the **scget** conda **environment**
+- Open the **directory** where the reference genome is stored
+- **Index** the genome, using **samtools** library
+```
+conda activate scget
+cd /home/references
+samtools index hg38.fa
+```
+# 4. How to use
+### a. Standard input 
+### b. Standard command
+### c. Standard output
+
+
+
+If you need to dig more into scGET settings, you can find more info about scGET usage in the **advanced.md** file.
