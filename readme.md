@@ -25,13 +25,24 @@ make check
 cp ./src/tagdust $CONDA_PREFIX/bin
 ```
 3. Similarly to the previous step, also **samtools** must be installed:
+   - Firstly, git repositories of **samtools** and **htslib** must be cloned
+   - Secondly, **htslib** must be compiled and installed
+   - Finally, **samtools** must be compiled and installed
 ```
-https://github.com/samtools/samtools
-https://github.com/samtools/htslib
+git clone https://github.com/samtools/samtools
+git clone https://github.com/samtools/htslib
+
+cd htslib
+autoreconf -i
+git submodule update --init –recursive
+./configure –prefix=$CONDA_PREFIX
+make 
+make install
+
 cd samtools
 autoheader
 autoconf -Wno-syntax
-./configure --without-curses
+./configure --prefix=$CONDA_PREFIX--without-curses
 make
 make install
 ```
@@ -74,16 +85,16 @@ use-conda: true
 ```
 
 ### b. scatACC path & genome path
-The scGET analysis must **start** from the **scGET directory**. The *scatACC library* is used for one the last step of scGET analysis as well as the *genome file*: therefore, the location of **scatACC directory** together with the path for the **genome** must be clarified in order to perform a succesful analysis.
+The scGET analysis must **start** from the **scGET directory**. The *scatACC library* is used for one the last step of scGET analysis as well as the *genome file* and the *bed file*: therefore, the location of **scatACC directory** together with the path for the **genome** and the **bed_file** must be clarified in order to perform a succesful analysis.
 
 
-*WHERE SHOULD I CLARIFY THE PATH FOR SCATACC DIRECTORY?*
+*WHERE SHOULD I CLARIFY SUCH PATHS?*
 
 
 Let's exemplify! 
 
 
-Let's assume that the **scGET** directory is located in our **home** directory (*/home/scGET*); while our **scatACC** directory is situated in a directory called *repositories* (*/home/repositories/scatACC*); on the other hand, the **genome**  file, which we have named *hg38.fa*, lays in the *references* directory (*/home/references/hg.38*):
+Let's assume that the **scGET** directory is located in our **home** directory (*/home/scGET*); while our **scatACC** directory is situated in a directory called *repositories* (*/home/repositories/scatACC*); on the other hand, the **genome**  file, which we have named *hg38.fa*, lays in the *references* directory (*/home/references/hg.38*) as well as the **bed_file** (*/home/references/hg385kbin.bed*):
 - First, we should open the *config.yaml* file present in **scGET** directory:
 ```
 cd /home/scGET
@@ -98,6 +109,8 @@ Output:
 >
 >genome: /home/genome.fa
 >
+>bed_file: /home/genome.bed
+>
 >threads: 8
 >
 >cell_number: 5000
@@ -111,7 +124,7 @@ Output:
 >output_path: ''
 
 
-- After that, we must modify the field *scatacc_path*, specifying our **actual scatACC path**, as well as the field *genome*, clarifying the **genome path** with the **genome file name**:
+- After that, we must modify the field *scatacc_path*, specifying our **actual scatACC path**, the field *genome*, clarifying the **genome path** with the **genome file name** and the field *bed_file* with the path for the **bed file**:
 
 
 Output:
@@ -122,6 +135,8 @@ Output:
 >barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
 >
 >genome: /home/**references**/**hg38.fa**
+>
+>bed_file: /home/**references**/**hg385kbin.bed**
 >
 >threads: 8
 >
