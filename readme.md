@@ -17,8 +17,9 @@ conda activate scget
 ```
 2. After having activated the *scget* environment, it is necessary to install the **TagDust** package. First, the package must be downloaded and compiled; second, from the *tagdust* directory we can copy the binary tagdust file in our *scget* environment: 
 ```
+wget https://sourceforge.net/projects/tagdust/files/tagdust-2.33.tar.gz/download
 tar -zxvf tagdust-2.33.tar.gz 
-cd tagdust
+cd tagdust-2.33
 ./configure 
 make
 make check
