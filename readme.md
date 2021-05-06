@@ -36,7 +36,7 @@ git clone https://github.com/samtools/htslib
 cd htslib
 autoreconf -i
 git submodule update --init –recursive
-./configure –prefix=$CONDA_PREFIX
+./configure --prefix=$CONDA_PREFIX
 make 
 make install
 
