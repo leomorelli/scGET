@@ -43,7 +43,7 @@ make install
 cd samtools
 autoheader
 autoconf -Wno-syntax
-./configure --prefix=$CONDA_PREFIX--without-curses
+./configure --prefix=$CONDA_PREFIX --without-curses
 make
 make install
 ```
