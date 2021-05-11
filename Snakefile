@@ -24,7 +24,7 @@ OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,
 
 rule all:
     input:              
-        expand('{output}/{sample}_{tn}_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
+        expand('{output}/{sample}_{tn}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 #  create log dir
 path = "logs_slurm/"+SAMPLE_NAME
@@ -192,7 +192,7 @@ rule merge_bam_tn5:
         threads=THREADS
     resources:
         cpus=4,
-        mem_mb=15000
+        mem_mb=24000
     output:
         expand('{output}/{sample}_tn5_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
     shell:
@@ -205,8 +205,45 @@ rule merge_bam_tnh:
         threads=THREADS
     resources:
         cpus=4,
-        mem_mb=15000
+        mem_mb=24000
     output:
         expand('{output}/{sample}_tnh_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
     shell:
         'samtools merge -c -p -@ {params.threads} {output} {input}'
+
+#7) Indexing merged files
+
+rule index_merged:
+    input:
+        '{output}/{sample}_{tn}_merged.bam'
+    params:
+        threads=THREADS
+    resources:
+        cpus=8,
+        mem_mb=24000
+    output:
+        '{output}/{sample}_{tn}_merged.bam.bai'
+    shell:
+        'samtools index {input}'
+
+# 8) Peak_count
+def spl(file):
+        name=file
+        return name[:-11]
+
+rule peak_count:
+    input:
+        bai='{output}/{sample}_{tn}_merged.bam.bai',
+        bam='{output}/{sample}_{tn}_merged.bam',
+        bed=config['bed_file']
+    params:
+        out=spl('{output}/{sample}_{tn}_merged.bam'),
+        threads=THREADS,
+        scatACC_path=config['scatacc_path']
+    resources:
+        cpus=8,
+        mem_mb=24000
+    output:
+        '{output}/{sample}_{tn}.h5ad'
+    shell:
+        'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A'
