@@ -23,7 +23,7 @@ OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,
 
 
 rule all:
-    input:              
+    input:
         expand('{output}/{sample}_{tn}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 #  create log dir
@@ -192,7 +192,7 @@ rule merge_bam_tn5:
         threads=THREADS
     resources:
         cpus=4,
-        mem_mb=24000
+        mem_mb=15000
     output:
         expand('{output}/{sample}_tn5_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
     shell:
@@ -205,7 +205,7 @@ rule merge_bam_tnh:
         threads=THREADS
     resources:
         cpus=4,
-        mem_mb=24000
+        mem_mb=15000
     output:
         expand('{output}/{sample}_tnh_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
     shell:
@@ -222,14 +222,14 @@ rule index_merged:
         cpus=8,
         mem_mb=24000
     output:
-        '{output}/{sample}_{tn}_merged.bam.bai'
+    	'{output}/{sample}_{tn}_merged.bam.bai'
     shell:
         'samtools index {input}'
 
 # 8) Peak_count
 def spl(file):
-        name=file
-        return name[:-11]
+	name=file
+	return name[:-11]
 
 rule peak_count:
     input:
