@@ -17,7 +17,7 @@ conda activate scget
 ```
 2. After having activated the *scget* environment, it is necessary to install the **TagDust** package. First, the package must be downloaded and compiled; second, from the *tagdust* directory we can copy the binary tagdust file in our *scget* environment: 
 ```
-wget https://sourceforge.net/projects/tagdust/files/tagdust-2.33.tar.gz/download
+wget https://sourceforge.net/projects/tagdust/files/tagdust-2.33.tar.gz
 tar -zxvf tagdust-2.33.tar.gz 
 cd tagdust-2.33
 ./configure 
@@ -71,7 +71,7 @@ Finally, there are three small tricks left to perform, before you can finally us
 
 
 ### a. Cluster set up
- - In your home directory check if you have a snakemake folder inside ``~/.config``. Inside this folder create a slurm folder add in a *config.yaml* file:
+ - In your home directory check if you have a snakemake folder inside ``${HOME}/.config``. Inside this folder create a slurm folder add in a *config.yaml* file:
 ```
 mkdir -p ${HOME}/.config/snakemake/slurm
 vi ${HOME}/.config/snakemake/slurm/config.yaml
