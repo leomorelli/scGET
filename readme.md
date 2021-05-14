@@ -176,11 +176,17 @@ Three different inputs are necessary to start the scGET analysis:
 
 
 Example:
->file_read1.fastq.gz
+>sample_S1_L001_R1_001.fastq.gz
 >
->file_read2.fastq.gz
+>sample_S1_L001_R2_001.fastq.gz
 >
->file_read3.fastq.gz
+>sample_S1_L001_R3_001.fastq.gz
+>
+>sample_S1_L002_R1_001.fastq.gz
+>
+>sample_S1_L002_R2_001.fastq.gz
+>
+>sample_S1_L002_R3_001.fastq.gz
 
 
 - Since the analysis starts from **scGET** directory, it is necesary to indicate the **path** to **FASTQ files**
@@ -194,11 +200,17 @@ Example: *FASTQ files* are stored in ``/home/files/experiment_test`` directory.
 vi input_file.txt
 ```
 After that, it must be modified as explained below:
->file_read1.fastq.gz 1
+>sample_S1_L001_R1_001.fastq.gz 1
 >
->file_read2.fastq.gz 2
+>sample_S1_L001_R2_001.fastq.gz 2 
 >
->file_read3.fastq.gz 3
+>sample_S1_L001_R3_001.fastq.gz 3
+> 
+>sample_S1_L002_R1_001.fastq.gz 1
+>
+>sample_S1_L002_R2_001.fastq.gz 2
+>
+>sample_S1_L002_R3_001.fastq.gz 3
 
 
 ### b. Standard command
