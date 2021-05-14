@@ -95,7 +95,7 @@ The scGET analysis must **start** from the **scGET directory**. The *scatACC lib
 Let's exemplify! 
 
 
-Let's assume that the **scGET** directory is located in our **home** directory (*/home/scGET*); while our **scatACC** directory is situated in a directory called *repositories* (*/home/repositories/scatACC*); on the other hand, the **genome**  file, which we have named *hg38.fa*, lays in the *references* directory (*/home/references/hg.38*) as well as the **bed_file** (*/home/references/hg385kbin.bed*):
+Let's assume that the **scGET** directory is located in our **home** directory (*${HOME}/scGET*); while our **scatACC** directory is situated in a directory called *repositories* (*${HOME}/repositories/scatACC*); on the other hand, the **genome**  file, which we have named *hg38.fa*, lays in the *references* directory (*${HOME}/references/hg.38*) as well as the **bed_file** (*${HOME}/references/hg385kbin.bed*):
 - First, we should open the *config.yaml* file present in **scGET** directory:
 ```
 cd ${HOME}/scGET
@@ -108,15 +108,15 @@ Output:
 >
 >barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
 >
->genome: /home/genome.fa
+>genome: ${HOME}/genome.fa
 >
->bed_file: /home/genome.bed
+>bed_file: ${HOME}/genome.bed
 >
 >threads: 8
 >
 >cell_number: 5000
 >
->scatacc_path: '/home/scatACC'
+>scatacc_path: '${HOME}/scatACC'
 >
 >input_path: ''
 >
@@ -135,15 +135,15 @@ Output:
 >
 >barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
 >
->genome: /home/**references**/**hg38.fa**
+>genome: ${HOME}/**references**/**hg38.fa**
 >
->bed_file: /home/**references**/**hg385kbin.bed**
+>bed_file: ${HOME}/**references**/**hg385kbin.bed**
 >
 >threads: 8
 >
 >cell_number: 5000
 >
->scatacc_path: '/home/**repositories**/scatACC'
+>scatacc_path: '${HOME}/**repositories**/scatACC'
 >
 >input_path: ''
 >
