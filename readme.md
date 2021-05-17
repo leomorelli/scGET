@@ -6,7 +6,7 @@ The workflow for analysis of scGET-generated data is based on the *Snakemake*: a
 
 
  ![dag](dag.svg)
- <img src="dag.svg" alt="dag" width="200"/>
+ <img src="dag.svg" alt="dag" width="4000"/>
 # 2. Installing scGET
 Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda environment. However, some of the packages requires different installation procedures. Therefore, we have designed a 4-step process, allowing an easy and quick generation of the *scget environment*.
 
