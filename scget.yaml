@@ -289,5 +289,4 @@ dependencies:
     - pysam==0.16.0.1
     - regex==2020.11.13
     - git+https://github.com/dawe/UMI-tools
-prefix: /home/morelli.leonardo/.conda/envs/scget
 
