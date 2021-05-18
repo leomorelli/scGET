@@ -3,12 +3,16 @@ import os
 import glob
 import importlib.util
 
-spec = importlib.util.spec_from_file_location("utility_functions", "scripts/utility_functions.py")
+abs_path=os.path.abspath('')
+
+
+spec = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
 utilities = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(utilities)
 
 
-configfile: 'config.yaml'
+configfile: f'{abs_path}/config.yaml'
+
 
 SAMPLE= config['sample']
 READS= config['reads']
