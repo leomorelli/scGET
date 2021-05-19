@@ -34,9 +34,9 @@ def list_of_files(path,file):
 		lof=[]
 		fin=open(file).read().split('\n')[:-1]
 		try:
-			int(fin[0].strip().split(' ')[-1])
+			int(fin[0].strip().split()[-1])
 			for f in fin:
-				nf=f.strip().split(' ')
+				nf=f.strip().split()
 				if len(path)<1:
 					d[str(nf[-1])].append(path+nf[0])
 				else:
@@ -47,7 +47,7 @@ def list_of_files(path,file):
 		except ValueError:
 			for f in fin:
 				p=re.compile('R(1|2|3)')    # pattern indicating the read number (R1 or R2 or R3)
-				nf=f.strip().split(' ')[0]      # file name
+				nf=f.strip().split()[0]      # file name
 				r=p.search(f)[0][-1]        # r is the read number (i.e. p.search[0]=R1, while p.search[0][-1]=1)
 				if len(path)<1:
 					d[str(r)].append(path+nf)
@@ -82,7 +82,7 @@ def list_of_files(path,file):
 						return [path+'/'+x for x in list_input]
     	# input: string with file names
 			else:
-				prelist=file.split(' ')
+				prelist=file.split()
 				list_input=[fin.strip() for fin in prelist]
 				if len(path)<1:
 					return list_input
