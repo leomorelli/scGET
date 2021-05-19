@@ -45,10 +45,9 @@ def list_of_files(path,file):
 					else:
 						d[str(nf[-1])].append(path+'/'+nf[0])
 		except ValueError:
-			for f in fin:
-				p=re.compile('R(1|2|3)')    # pattern indicating the read number (R1 or R2 or R3)
+			for f in fin:   
 				nf=f.strip().split()[0]      # file name
-				r=p.search(f)[0][-1]        # r is the read number (i.e. p.search[0]=R1, while p.search[0][-1]=1)
+				r=re.search('(1|2|3)R_',nf[::-1])[0][0]        # (1|2|3)R_ pattern indicating the read number (R1 or R2 or R3), while r is the read number (i.e. p.search[0]=R1, while p.search[0][-1]=1)
 				if len(path)<1:
 					d[str(r)].append(path+nf)
 				else:
