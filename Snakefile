@@ -68,7 +68,7 @@ rule merge_reads:
     output:
         '{output}/{sample}_READ{read}.fastq.gz'
     shell:
-        "for F in $(cat {input}) ; do cat $F>>{output}; done"
+        "cat $(cat {input}) > {output}"
 
 
 #1a) Classify each read using its barcode
