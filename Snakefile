@@ -24,7 +24,8 @@ INPUT_LIST=config['input_list']
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
 
-
+binary_dictionary={True:'-c',False:''}
+BINARY=binary_dictionary[config['binary']]
 
 rule all:
     input:
@@ -243,11 +244,12 @@ rule peak_count:
     params:
         out=spl('{output}/{sample}_{tn}_merged.bam'),
         threads=THREADS,
-        scatACC_path=config['scatacc_path']
+        scatACC_path=config['scatacc_path'],
+        binary=BINARY
     resources:
         cpus=8,
         mem_mb=24000
     output:
         '{output}/{sample}_{tn}.h5ad'
     shell:
-        'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A'
+        'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A {params.binary}'

@@ -11,4 +11,5 @@ scatacc_path: '/home/scatACC'
 input_path: ''
 input_list: ''
 output_path: ''
+binary: True
 ...
