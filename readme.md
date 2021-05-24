@@ -6,7 +6,7 @@ scGET architecture is built using `Snakemake`: a workflow management system, whi
 
  ![dag](dag.svg)
 # 2. Installing scGET
-Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda environment. However, some of the packages requires different installation procedures. Therefore, we have designed a 4-step process, allowing an easy and quick generation of the **scget environment**.
+Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda **environment**. However, some packages cannot be installed, using conda. Therefore, we have designed a 4-step process, allowing an easy and quick generation of the **scget environment**.
 
 
 1. The conda environment can be automatically generated, thanks to the **scget.yaml** file:
@@ -14,7 +14,7 @@ Before getting your hands dirty with scGET analyses, it is necessary to create a
 conda env create -f scget.yaml
 conda activate scget
 ```
-2. After having activated the scget environment, it is necessary to install the `TagDust` package. First, the package must be downloaded and compiled; second, from the tagdust directory, we can copy the binary tagdust file in our scget environment: 
+2. `TagDust` package must be installed, after the activation of the **scget environment**. First, the package must be downloaded and compiled; second, from the tagdust directory, we can copy the binary tagdust file in the scget environment: 
 ```
 wget https://sourceforge.net/projects/tagdust/files/tagdust-2.33.tar.gz
 tar -zxvf tagdust-2.33.tar.gz 
@@ -50,7 +50,7 @@ make install
 ```
 git clone https://github.com/dawe/scatACC.git
 ```
-In order to perform the analysis through the cluster, it may be useful to check if `screen` package is already installed:
+In order to perform the analysis through `slurm`, it may be useful to check if `screen` package is already installed:
 ```
 screen --version
 ```
@@ -86,10 +86,10 @@ use-conda: true
 ```
 
 ### b. scatACC path & genome paths
-The scGET analysis must **start** from the **scGET directory**. The scatACC library is used for one the last step of scGET analysis as well as the genome file and the bed file: therefore, the location of **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in order to perform a succesful analysis.
+scGET analyses **start** from **scGET directory**. The path for **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in the **config.yaml**.
 
 
-
+EXAMPLE:
 Let's assume that the **scGET** directory is located in our **home** directory (`${HOME}/scGET`); while our **scatACC** directory is situated in a directory called repositories (`${HOME}/repositories/scatACC`); on the other hand, the **genome**  file, which we have named hg38.fa, lays in the references directory (`${HOME}/references/hg.38`) as well as the **bed_file** (`${HOME}/references/hg385kbin.bed`):
 - First, you should open the config.yaml file, in the **scGET** directory:
 ```
