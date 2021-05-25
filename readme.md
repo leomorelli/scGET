@@ -83,7 +83,8 @@ resources: [cpus=10, mem_mb=50000]
 use-conda: true
 ```
 
-# Configuration management
+# 4. Configuration management
+![conf_params](conf_params.png)
 scGET analyses **start** from **scGET directory**. The path for **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in the **config.yaml**.
 
 
@@ -157,7 +158,7 @@ conda activate scget
 cd ${HOME}/references
 samtools index hg38.fa
 ```
-# 4. Run
+# 5. Run
 Now it's time to start the analysis! It is important to remember that the scGET analysis must be performed from the **scGET directory**. Therefore, before starting the workflow, you should reach the **scGET directory** and activate the **scGET environment**.
 ```
 cd ${HOME}/scGET
