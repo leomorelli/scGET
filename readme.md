@@ -65,11 +65,9 @@ sudo apt install screen
 ```
 
  
-# 3. Set up
-Finally, there are three small tricks left to perform, before you can finally use `scGET`.
+# 3. Slurm set up
+Although `scGET` can be used locally, it is optimized to work on a cluster, managed by `Slurm` workload manager.
 
-
-### a. Cluster set up
  - Inside ``${HOME}/.config``, you should create a series of nested direcories such that you obtain the following path `${HOME}/.config/snakemake/slurm`. Inside the **slurm folder**, you can now generate  a **config.yaml** file:
 ```
 mkdir -p ${HOME}/.config/snakemake/slurm
@@ -85,7 +83,7 @@ resources: [cpus=10, mem_mb=50000]
 use-conda: true
 ```
 
-### b. scatACC path & genome paths
+# Configuration management
 scGET analyses **start** from **scGET directory**. The path for **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in the **config.yaml**.
 
 
