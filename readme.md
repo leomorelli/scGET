@@ -84,14 +84,18 @@ use-conda: true
 ```
 
 # 4. Configuration management
+`scGET` allows the configuration of different parameters. The `config.yaml` file contains the default setting of each parameter. However, each default setting can be configured differently, directly from terminal. Here you can see a visual representation of configurable parameters needed for a personalyzed analysis.
+
 ![conf_params](conf_params.png)
+
+### input_file and input_list
 
 
 scGET analyses **start** from **scGET directory**. The path for **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in the **config.yaml**.
 
 
 EXAMPLE:
-Let's assume that the **scGET** directory is located in our **home** directory (`${HOME}/scGET`); while our **scatACC** directory is situated in a directory called repositories (`${HOME}/repositories/scatACC`); on the other hand, the **genome**  file, which we have named hg38.fa, lays in the references directory (`${HOME}/references/hg.38`) as well as the **bed_file** (`${HOME}/references/hg385kbin.bed`):
+Let's assume that the scGET directory is located in our **home** directory (`${HOME}/scGET`); while our **scatACC** directory is situated in a directory called repositories (`${HOME}/repositories/scatACC`); on the other hand, the **genome**  file, which we have named hg38.fa, lays in the references directory (`${HOME}/references/hg.38`) as well as the **bed_file** (`${HOME}/references/hg385kbin.bed`):
 - First, you should open the config.yaml file, in the **scGET** directory:
 ```
 cd ${HOME}/scGET
