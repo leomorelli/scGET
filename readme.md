@@ -85,6 +85,8 @@ use-conda: true
 
 # 4. Configuration management
 ![conf_params](conf_params.png)
+
+
 scGET analyses **start** from **scGET directory**. The path for **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in the **config.yaml**.
 
 
