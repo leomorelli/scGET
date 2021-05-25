@@ -6,10 +6,13 @@ import importlib.util
 abs_path=os.path.abspath('')
 
 
-spec = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
-utilities = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(utilities)
+spec_u = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
+utilities = importlib.util.module_from_spec(spec_u)
+spec_u.loader.exec_module(utilities)
 
+spec_i = importlib.util.spec_from_file_location("get_info",f"{abs_path}/scripts/get_info.py")
+infos = importlib.util.module_from_spec(spec_i)
+spec_i.loader.exec_module(infos)
 
 configfile: f'{abs_path}/config.yaml'
 
@@ -24,26 +27,25 @@ INPUT_LIST=config['input_list']
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
 
-binary_dictionary={True:'-c',False:''}
-BINARY=binary_dictionary[config['binary']]
+
 
 rule all:
     input:
         expand('{output}/{sample}_{tn}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 #  create log dir
-path = "logs_slurm/"+SAMPLE_NAME
+log_path = "logs_slurm/"+SAMPLE_NAME
 try:
     os.mkdir("logs_slurm")
-    os.mkdir(path)
+    os.mkdir(log_path)
 except OSError:
     try:
-        os.mkdir(path)
-        print("Successfully created the directory %s " % path)
+        os.mkdir(log_path)
+        print("Successfully created the directory %s " % log_path)
     except OSError:
-        print ("Creation of the directory %s failed" % path)
+        print ("Creation of the directory %s failed" % log_path)
 else:
-    print ("Successfully created the directory %s " % path)
+    print ("Successfully created the directory %s " % log_path)
 
 rule mkdir:
 	input:
@@ -57,17 +59,18 @@ rule file_read:
     input:
         files=utilities.list_of_files(INPUT_PATH,INPUT_LIST),
     output:
-        temp(expand('info_READ{read}.txt',output=OUTPUT_PATH,read=READS)),
-    script:
-        'scripts/get_info.py'
+        temp(expand('{output}/info_READ{read}.txt',output=OUTPUT_PATH,read=READS)),
+    run:
+        info_read=infos.df_info(input)
+        infos.create_read_files(OUTPUT_PATH,info_read)
 
 
 #0b) Rename each file with a tag expressing the number of read
 rule merge_reads:
     input:
-        'info_READ{read}.txt'
+        '{output_path}/info_READ{read}.txt'
     output:
-        '{output}/{sample}_READ{read}.fastq.gz'
+        '{output_path}/{sample}_READ{read}.fastq.gz'
     shell:
         "cat $(cat {input}) > {output}"
 
@@ -244,12 +247,11 @@ rule peak_count:
     params:
         out=spl('{output}/{sample}_{tn}_merged.bam'),
         threads=THREADS,
-        scatACC_path=config['scatacc_path'],
-        binary=BINARY
+        scatACC_path=config['scatacc_path']
     resources:
         cpus=8,
         mem_mb=24000
     output:
         '{output}/{sample}_{tn}.h5ad'
     shell:
-        'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A {params.binary}'
+        'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A'
