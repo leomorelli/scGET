@@ -5,6 +5,9 @@
 
 
 ### 1. input_list
+
+
+The `input_list` must be a text file. Each line of the `input_list` corresponds to the name of one of the fastq files. The `input_list` can be characterized by two formats:
 ### 2. input_path
 ### 3. cell_number
 ### 4. genome
