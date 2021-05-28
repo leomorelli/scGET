@@ -11,18 +11,32 @@ f
 
 
 The `input_list` must be a text file. Each line has to indicate the name of one of the fastq files. The `input_list` is accepted in two fromats:
-1. *name_of_the_file* + *read_number*: read numbers are explicitly expressed for each file.
-Example:
->
->
->
->
->
->
->
+1. *name_of_the_file* + *read_number*: read numbers are explicitly expressed for each file:
+> sample_S1_L001_R1_001.fastq.gz 1
+> 
+> sample_S1_L001_R2_001.fastq.gz 2
+> 
+> sample_S1_L001_R3_001.fastq.gz 3
+> 
+> sample_S1_L002_R1_001.fastq.gz 1
+> 
+> sample_S1_L002_R2_001.fastq.gz 2
+> 
+> sample_S1_L002_R3_001.fastq.gz 3
+    
 
-
-2. *name_of_the_file*
+2. *name_of_the_file*: each line of the `input_list` indicates the name of the file only. The read is assigned:
+> sample_S1_L001_R1_001.fastq.gz 
+> 
+> sample_S1_L001_R2_001.fastq.gz 
+> 
+> sample_S1_L001_R3_001.fastq.gz 
+> 
+> sample_S1_L002_R1_001.fastq.gz 
+> 
+> sample_S1_L002_R2_001.fastq.gz 
+> 
+> sample_S1_L002_R3_001.fastq.gz 
 
 
 ### 2. input_path
