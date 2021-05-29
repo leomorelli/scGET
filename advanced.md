@@ -58,10 +58,19 @@ Sample name can be clarified thanks to `sample` parameter. If sample name is not
 
 
 Example:
-- `input_path`= ${HOME}/fastq/clone12 &#8594; `sample`=clone12
+
+
+`input_path`= ${HOME}/fastq/clone12 &#8594; `sample`=clone12
+
+
+While if the `input_path` is not indicated (i.e. input files are located in your current folder), `sample`= `scGET_sample` by default.
+
+
+Example:
 
 
 
+`input_path`= '' &#8594; `sample`=scGET_sample
 ### 9. output_path
 It indicates where `scGET` results will be stored: resulting files will be stored in a folder named after the sample name.
 
