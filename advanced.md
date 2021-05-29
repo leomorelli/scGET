@@ -1,5 +1,5 @@
 # scGET sequencing
-f
+![scget_workflow](scget_workflow.png)
 # Configuration management
 `scGET` allows the configuration of different parameters. The `config.yaml` file contains the default setting of each parameter. However, each default setting can be configured differently, directly from terminal. Here you can see a visual representation of configurable parameters needed for a personalyzed analysis.
 
