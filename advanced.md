@@ -11,7 +11,7 @@ f
 
 
 The `input_list` must be a text file. Each line has to indicate the name of one of the fastq files. The `input_list` is accepted in two fromats:
-1. *name_of_the_file* + *read_number*: read numbers are explicitly expressed for each file:
+1. *name_of_the_file* + *read_number*: read numbers are explicitly expressed for each file to each file:
 > sample_S1_L001_R1_001.fastq.gz 1
 > 
 > sample_S1_L001_R2_001.fastq.gz 2
@@ -52,6 +52,23 @@ It is necessary to clarify the path for `scatACC` directory in order to perform 
 ### 6. bed_file
 This parameter is mandatory for the peak count step. It may be more convenient to modify the `bed_file` parameter directly from the `config.yaml` file.
 ### 7. binary
+If `binary`= False, it enables the selection of output counts over intervals instead of binary data. `binary`= True by default.
+### 8. sample
+Sample name can be clarified thanks to `sample` parameter. If sample name is not indicated, `sample` is equal to the name of the last folder of the `input_path`:
 
-### 8. output_path
-### 9. sample
+
+Example:
+- `input_path`= ${HOME}/fastq/clone12 &#8594; `sample`=clone12
+
+
+
+### 9. output_path
+It indicates where `scGET` results will be stored: resulting files will be stored in a folder named after the sample name.
+
+
+Example:
+- `output_path`= ${HOME}/results
+- `sample`= scget_files
+
+
+Finally, each file can be found at `${HOME}/results/scget_files` path.
