@@ -77,9 +77,9 @@ vi config.yaml
  - After that, you have to **compile** the config.yaml file as explained below (remember to update the queue name specified by the ``-p`` option and  your ``mail-user``):
 ```
 jobs: 34
-cluster: "sbatch --mem={resources.mem_mb} -c {resources.cpus} -o logs_slurm/{SAMPLE_NAME}/{rule}.o -e logs_slurm/{SAMPLE_NAME}/{rule}.e --mail-type=FAIL --mail-user=user.mail@hsr.it"
-default-resources: [cpus=1, mem_mb=2000]
-resources: [cpus=10, mem_mb=50000]
+cluster: "sbatch --mem={resources.mem_mb} -c {resources.cpus} -o {OUTPUT_PATH}/logs_slurm/{rule}.o -e {OUTPUT_PATH}/logs_slurm/{rule}.e --mail-type=FAIL --mail-user=morelli.leonardo@hsr.it"
+default-resources: [cpus=1, mem_mb=5000]
+resources: [cpus=40, mem_mb=60000]
 use-conda: true
 ```
 
