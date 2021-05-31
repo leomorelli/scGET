@@ -1,4 +1,8 @@
 # scGET sequencing
+**scGET sequencing** approach enables the analysis of both accessible and compacted chromatin, exploiting the ability of two transposases: **tn5** recognizes open chromatin, while **tnh** recognizes closed chromatin. **scGET** protocol generates 3 different reads each genomic fragment:
+- read 1 (R1) represents the **foreward read**
+- read 2 (R2) accounts for the **cellular barcode**
+- read 3 (R3) represents the **reverse read**
 <img src="img/scget_workflow.png" alt="img/scget_workflow" width="700"/>
 
 # Configuration management
