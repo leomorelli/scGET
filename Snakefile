@@ -35,24 +35,20 @@ rule all:
         expand('{output}/{sample}_{tn}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
 
 #  create log dir
-log_path = "logs_slurm/"+SAMPLE_NAME
+log_path = OUTPUT_PATH+"/logs_slurm"
 try:
-    os.mkdir("logs_slurm")
+    os.mkdir(OUTPUT_PATH+"/logs_slurm")
     os.mkdir(log_path)
 except OSError:
     try:
-        os.mkdir(log_path)
+        os.makedirs(log_path)
         print("Successfully created the directory %s " % log_path)
     except OSError:
         print ("Creation of the directory %s failed" % log_path)
 else:
     print ("Successfully created the directory %s " % log_path)
 
-rule mkdir:
-	input:
-		out=OUTPUT_PATH
-	shell:
-		'mkdir -p {input}'
+
 # 0) PREMERGE OF DIFFERENT INPUT FILES
 # 0a) Create a text file where each file is assigned to its read
 
@@ -143,7 +139,7 @@ rule bwa:
         threads_samtools=THREADS-6
     resources:
         cpus=8,
-        mem_mb=30000
+        mem_mb=10000
     output:
         '{output}/{sample}_BC_{barcode}.bam'
     shell:
@@ -157,7 +153,7 @@ rule index_allignement:
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=30000
+        mem_mb=10000
     output:
         '{output}/{sample}_BC_{barcode}.bam.bai'
     shell:
