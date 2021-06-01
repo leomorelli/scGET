@@ -27,7 +27,7 @@ INPUT_LIST=config['input_list']
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
 
-binary_dictionary={True:'-c',False:''}
+binary_dictionary={True:'',False:'-c'}
 BINARY=binary_dictionary[config['binary']]
 
 rule all:
