@@ -6,6 +6,11 @@ scGET architecture is built using `Snakemake`: a workflow management system, whi
 
  ![img/dag](img/dag.svg)
 # 2. Installing scGET
+First, `scGET` repository must be cloned:
+```
+git clone https://github.com/leomorelli/scGET.git
+```
+
 Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda **environment**. However, some packages cannot be installed, using conda. Therefore, we have designed a 4-step process, allowing an easy and quick generation of the **scget environment**.
 
 
