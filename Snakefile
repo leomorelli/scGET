@@ -32,7 +32,7 @@ BINARY=binary_dictionary[config['binary']]
 
 rule all:
     input:
-        expand('{output}/{sample}_{tn}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, tn=TN_BARCODES.keys())
+        expand('{output}/{sample}_BC_{barcode}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=BARCODES)
 
 #  create log dir
 log_path = OUTPUT_PATH+"/logs_slurm"
@@ -156,6 +156,8 @@ rule index_allignement:
         mem_mb=10000
     output:
         '{output}/{sample}_BC_{barcode}.bam.bai'
+    wildcard_constraints:
+        barcode="[A-Z]+"
     shell:
         'samtools index {input}'
 
@@ -189,60 +191,33 @@ rule dedup:
         'python {params.scatACC_path}/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python {params.scatACC_path}/cbdedup.py -I -o {output}'
         
 
-#6) merge
-rule merge_bam_tn5:
+# 6) indexing dedup files
+rule index_dedup:
     input:
-        expand('{output}/{sample}_BC_{barcode}_bcdedup.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=TN_BARCODES['tn5'])
-    params:
-        threads=THREADS
-    resources:
-        cpus=4,
-        mem_mb=15000
-    output:
-        expand('{output}/{sample}_tn5_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
-    shell:
-        'samtools merge -c -p -@ {params.threads} {output} {input}'
-
-rule merge_bam_tnh:
-    input:
-        expand('{output}/{sample}_BC_{barcode}_bcdedup.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=TN_BARCODES['tnh'])
-    params:
-        threads=THREADS
-    resources:
-        cpus=4,
-        mem_mb=15000
-    output:
-        expand('{output}/{sample}_tnh_merged.bam',output=OUTPUT_PATH, sample=SAMPLE_NAME)
-    shell:
-        'samtools merge -c -p -@ {params.threads} {output} {input}'
-
-#7) Indexing merged files
-
-rule index_merged:
-    input:
-        '{output}/{sample}_{tn}_merged.bam'
+        '{output}/{sample}_BC_{barcode}_bcdedup.bam'
     params:
         threads=THREADS
     resources:
         cpus=8,
         mem_mb=24000
     output:
-    	'{output}/{sample}_{tn}_merged.bam.bai'
+        '{output}/{sample}_BC_{barcode}_bcdedup.bam.bai'
     shell:
         'samtools index {input}'
 
-# 8) Peak_count
+
+# 7) Peak_count
 def spl(file):
-	name=file
-	return name[:-11]
+        name=file
+        return name[:-12]
 
 rule peak_count:
     input:
-        bai='{output}/{sample}_{tn}_merged.bam.bai',
-        bam='{output}/{sample}_{tn}_merged.bam',
+        bai='{output}/{sample}_BC_{barcode}_bcdedup.bam.bai',
+        bam='{output}/{sample}_BC_{barcode}_bcdedup.bam',
         bed=config['bed_file']
     params:
-        out=spl('{output}/{sample}_{tn}_merged.bam'),
+        out=spl('{output}/{sample}_BC_{barcode}_bcdedup.bam'),
         threads=THREADS,
         scatACC_path=config['scatacc_path'],
         binary=BINARY
@@ -250,6 +225,9 @@ rule peak_count:
         cpus=8,
         mem_mb=24000
     output:
-        '{output}/{sample}_{tn}.h5ad'
+        '{output}/{sample}_BC_{barcode}.h5ad'
     shell:
         'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A {params.binary}'
+
+
+
