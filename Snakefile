@@ -16,11 +16,17 @@ spec_i.loader.exec_module(infos)
 
 configfile: f'{abs_path}/config.yaml'
 
+if config['atac']==True:
+    TN_BARCODES=config['barcodes']
+    BARCODES=TN_BARCODES['tn5']
+    CELL_NUMBER=config['cell_number']*2
+else:
+    TN_BARCODES=config['barcodes']
+    BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
+    CELL_NUMBER=config['cell_number']  
 
 SAMPLE= config['sample']
 READS= config['reads']
-TN_BARCODES=config['barcodes']
-BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
 THREADS=config['threads']
 INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
@@ -32,7 +38,8 @@ BINARY=binary_dictionary[config['binary']]
 
 rule all:
     input:
-        expand('{output}/{sample}_BC_{barcode}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=BARCODES)
+        expand('{output}/{sample}_BC_{barcode}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=BARCODES),
+       
 
 #  create log dir
 log_path = OUTPUT_PATH+"/logs_slurm"
@@ -101,7 +108,7 @@ rule umi_tools:
         method='reads',
         extract_method='string',
         bc_pattern='CCCCCCCCCCCCCCCC',
-        cell_number=config['cell_number'], # 5000 by default
+        cell_number=CELL_NUMBER, # 5000 by default
         subset_reads='10000000000',
         output_path=OUTPUT_PATH
     resources:
@@ -230,4 +237,23 @@ rule peak_count:
         'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A {params.binary}'
 
 
+#8) naming files with tn tag
 
+def tn_tag(file):
+    bc=file.split('.')[0].split('_')[-1]
+    if bc in TN_BARCODES['tn5']:
+        return 'tn5'
+    elif bc in TN_BARCODES['tnh']:
+        return 'tnh'
+    else:
+        return 'nan'
+
+#rule rename_h5ad:
+#    input:
+#        '{output}/{sample}_BC_{barcode}.h5ad'
+#    params:
+#        tn=tn_tag('{output}/{sample}_BC_{barcode}.h5ad')
+#    output:
+#        '{output}/{sample}_{params.tn}_{barcode}.h5ad'
+#    shell:
+#        'mv {input} {output}'

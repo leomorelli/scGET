@@ -3,13 +3,14 @@
 sample: ''
 reads: [1,2,3]
 barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
-genome: /home/genome.fa
-bed_file: /home/genome_5k.bed
+genome: ../reference/hg38/hg38.fa
+bed_file: ../reference/hg38/hg38_5kbin.bed
 threads: 8
 cell_number: 5000
-scatacc_path: '/home/scatACC'
+scatacc_path: '../repo/scatACC'
 input_path: ''
 input_list: ''
 output_path: ''
 binary: True
+atac: False
 ...
