@@ -1,5 +1,6 @@
 import gzip
 import os
+import re
 import glob
 import importlib.util
 
