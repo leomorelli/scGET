@@ -1,4 +1,5 @@
 import glob
+import re
 
 #adjust path with and without final slash
 def output(path,sample):            
@@ -60,14 +61,26 @@ def list_of_files(path,file):
 		return lof
 	else:
     	# no input file (search in directory)
+		d={'1':[],'2':[],'3':[]}
+		lof=[]
+		path=str(path)
 		if len(file)<1:
 			if len(path)<1:
-				return glob.glob('*fastq.gz')
+				prelist=glob.glob('*fastq.gz')
 			else:
 				if path[-1]=='/':
-					return glob.glob(path+'*fastq.gz')
+					prelist=glob.glob(path+'*fastq.gz')
 				else:
-					return glob.glob(path+'/'+'*fastq.gz')
+					prelist=glob.glob(path+'/'+'*fastq.gz')
+		for f in prelist:
+			try:
+				r=re.search('(1|2|3)R_',f[::-1])[0][0]
+				d[r].append(f)
+			except TypeError:
+				continue
+		for i in d:
+			lof.append(d[i])
+		return lof
 
 
 # obtain the tn barcode for each passed file
