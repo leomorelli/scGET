@@ -19,12 +19,11 @@ configfile: f'{abs_path}/config.yaml'
 if config['atac']==True:
     TN_BARCODES=config['barcodes']
     BARCODES=TN_BARCODES['tn5']
-    CELL_NUMBER=config['cell_number']*2
 else:
     TN_BARCODES=config['barcodes']
     BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
-    CELL_NUMBER=config['cell_number']  
-
+    
+CELL_NUMBER=config['cell_number']  
 SAMPLE= config['sample']
 READS= config['reads']
 THREADS=config['threads']
