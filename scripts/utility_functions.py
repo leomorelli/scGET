@@ -68,28 +68,7 @@ def list_of_files(path,file):
 					return glob.glob(path+'*fastq.gz')
 				else:
 					return glob.glob(path+'/'+'*fastq.gz')
-		else:
-    	# input: list with file names
-			if str(file).startswith('['):
-				list_input=[fin.strip() for fin in file]
-				if len(path)<1:
-					return list_input
-				else:
-					if path[-1]=='/':
-						return [path+x for x in list_input]
-					else:
-						return [path+'/'+x for x in list_input]
-    	# input: string with file names
-			else:
-				prelist=file.split()
-				list_input=[fin.strip() for fin in prelist]
-				if len(path)<1:
-					return list_input
-				else:
-					if path[-1]=='/':
-						return [path+x for x in list_input]
-					else:
-						return [path+'/'+x for x in list_input]
+
 
 # obtain the tn barcode for each passed file
 def exp_bc(file):
