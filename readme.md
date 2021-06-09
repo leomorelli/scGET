@@ -163,7 +163,7 @@ If the genome has not been indexed yet, you can make up for this in three steps:
 ```
 conda activate scget
 cd ${HOME}/references
-samtools index hg38.fa
+bwa index hg38.fa
 ```
 # 5. Input file
 
