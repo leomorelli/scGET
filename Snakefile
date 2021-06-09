@@ -149,6 +149,8 @@ rule bwa:
         mem_mb=10000
     output:
         '{output}/{sample}_BC_{barcode}.bam'
+    wildcard_constraints:
+        barcode="[A-Z]+"
     shell:
         'bwa mem -R "@RG\\tID:BC_{params.ids}\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
 #4a) indexing allignement
