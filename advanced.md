@@ -11,7 +11,6 @@ Once the **sequencing** protocol is finished, R1, R2 and R3 reads will be stored
 From these files starts the analysis with `scGET` library.
 
 
-`scGET` library
 
 # Configuration management
 `scGET` allows the configuration of different parameters. The `config.yaml` file contains the default setting of each parameter. However, each default setting can be configured differently, directly from terminal. Here you can see a visual representation of configurable parameters needed for a personalyzed analysis.
