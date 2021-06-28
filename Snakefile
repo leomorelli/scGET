@@ -3,6 +3,8 @@ import os
 import re
 import glob
 import importlib.util
+import scanpy as sc
+import anndata
 
 abs_path=os.path.abspath('')
 
@@ -15,10 +17,20 @@ spec_i = importlib.util.spec_from_file_location("get_info",f"{abs_path}/scripts/
 infos = importlib.util.module_from_spec(spec_i)
 spec_i.loader.exec_module(infos)
 
+spec_l = importlib.util.spec_from_file_location("tn_layers",f"{abs_path}/scripts/tn_layers.py")
+layers = importlib.util.module_from_spec(spec_l)
+spec_l.loader.exec_module(layers)
+
+
 configfile: f'{abs_path}/config.yaml'
 
-if config['atac']==True:
-    TN_BARCODES=config['barcodes']
+if config['tn5']!=True:
+    TN_BARCODE=config['barcodes']
+    TN_BARCODES={'tnh':TN_BARCODE['tnh']}
+    BARCODES=TN_BARCODES['tnh']
+elif config['tnh']!=True:
+    TN_BARCODE=config['barcodes']
+    TN_BARCODES={'tn5':TN_BARCODE['tn5']}
     BARCODES=TN_BARCODES['tn5']
 else:
     TN_BARCODES=config['barcodes']
@@ -33,12 +45,12 @@ INPUT_LIST=config['input_list']
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
 
-binary_dictionary={True:'',False:'-c'}
+binary_dictionary={True:'-B',False:''}
 BINARY=binary_dictionary[config['binary']]
 
 rule all:
     input:
-        expand('{output}/{sample}_BC_{barcode}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=BARCODES),
+        expand('{output}/adata_{sample}.h5ad', output=OUTPUT_PATH,sample=SAMPLE_NAME)
        
 
 #  create log dir
@@ -153,6 +165,7 @@ rule bwa:
         barcode="[A-Z]+"
     shell:
         'bwa mem -R "@RG\\tID:BC_{params.ids}\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
+
 #4a) indexing allignement
 
 rule index_allignement:
@@ -174,12 +187,15 @@ rule index_allignement:
 def tn_id(file):
     BCs=TN_BARCODES
     bc_in=utilities.exp_bc(file)
-    if bc_in in BCs['tn5']:
-        return 'tn5'        
-    elif bc_in in BCs['tnh']:
-        return 'tnh' 
+    if len(TN_BARCODES)>2:
+        if bc_in in BCs['tn5']:
+            return 'tn5'        
+        elif bc_in in BCs['tnh']:
+            return 'tnh' 
+        else:
+            return 'nan'
     else:
-        return 'nan'
+        return TN_BARCODES.keys()
 
 rule dedup:
     input:
@@ -236,26 +252,17 @@ rule peak_count:
     output:
         '{output}/{sample}_BC_{barcode}.h5ad'
     shell:
-        'python {params.scatACC_path}/peak_count.py -p {input.bed} -b {input.bam} -o {params.out} -A {params.binary}'
+        'python {params.scatACC_path}/para_count.py -p {input.bed} -b {input.bam} -o {params.out} -t {params.threads} {params.binary}'
 
+#8) single anndata with tnh and tn5 layers
 
-#8) naming files with tn tag
-
-def tn_tag(file):
-    bc=file.split('.')[0].split('_')[-1]
-    if bc in TN_BARCODES['tn5']:
-        return 'tn5'
-    elif bc in TN_BARCODES['tnh']:
-        return 'tnh'
-    else:
-        return 'nan'
-
-#rule rename_h5ad:
-#    input:
-#        '{output}/{sample}_BC_{barcode}.h5ad'
-#    params:
-#        tn=tn_tag('{output}/{sample}_BC_{barcode}.h5ad')
-#    output:
-#        '{output}/{sample}_{params.tn}_{barcode}.h5ad'
-#    shell:
-#        'mv {input} {output}'
+rule layers:
+    input:
+        expand('{output}/{sample}_BC_{barcode}.h5ad',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcode=BARCODES)
+    resources:
+        cpus=8,
+        mem_mb=55000
+    output:
+        '{output}/adata_{sample}.h5ad'
+    run:
+        layers.add_layer(OUTPUT_PATH,SAMPLE_NAME,TN_BARCODES)
