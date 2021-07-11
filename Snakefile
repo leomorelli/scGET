@@ -208,7 +208,7 @@ rule dedup:
     output:
         '{output}/{sample}_BC_{barcode}_bcdedup.bam'
     shell:
-        'python {params.scatACC_path}/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn}_{wildcards.barcode} | python {params.scatACC_path}/cbdedup.py -I -o {output}'
+        'python {params.scatACC_path}/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn} | python {params.scatACC_path}/cbdedup.py -I -o {output}'
         
 
 # 6) indexing dedup files
