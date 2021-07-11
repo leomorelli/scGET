@@ -185,17 +185,12 @@ rule index_allignement:
 
 # 5) deduplication
 def tn_id(file):
-    BCs=TN_BARCODES
-    bc_in=utilities.exp_bc(file)
-    if len(TN_BARCODES)>2:
-        if bc_in in BCs['tn5']:
-            return 'tn5'        
-        elif bc_in in BCs['tnh']:
-            return 'tnh' 
-        else:
-            return 'nan'
+    if bc_in in config['barcodes']['tn5']:
+        return 'tn5'        
+    elif bc_in in config['barcodes']['tnh']:
+        return 'tnh' 
     else:
-        return TN_BARCODES.keys()
+        return 'None'
 
 rule dedup:
     input:
@@ -207,7 +202,7 @@ rule dedup:
         cpus=8,
         mem_mb=30000
     params:
-        tn=tn_id('{sample}_BC_{barcode}_READ2.fq.gz'),
+        tn=lambda wildcards: tn_id(wildcards.barcode),
         prefix=SAMPLE_NAME,
         scatACC_path=config['scatacc_path']
     output:
