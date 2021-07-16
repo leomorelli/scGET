@@ -11,6 +11,7 @@ scatacc_path: '../repo/scatACC'
 input_path: ''
 input_list: ''
 output_path: ''
-binary: True
-atac: False
+binary: False
+tnh: True
+tn5: True
 ...
