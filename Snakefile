@@ -8,7 +8,7 @@ import anndata
 
 abs_path=os.path.abspath('')
 
-# [a] SCRIPTS DEFINITION
+# [A] SCRIPTS IMPORT
 spec_u = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
 utilities = importlib.util.module_from_spec(spec_u)
 spec_u.loader.exec_module(utilities)
@@ -21,7 +21,7 @@ spec_l = importlib.util.spec_from_file_location("tn_layers",f"{abs_path}/scripts
 layers = importlib.util.module_from_spec(spec_l)
 spec_l.loader.exec_module(layers)
 
-# [b] CONFIG HANDLING
+# [B] CONFIG HANDLING
 configfile: f'{abs_path}/config.yaml'
 
 # [b.1] DEFINITION OF TRANSPOSASES AND BARCODES FOR SCGET ANALYSIS
@@ -46,14 +46,13 @@ INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
+ATAC=config['atac']
 
-# [b.3] ATAC CONFIGURATION (no scGET analysis)
-
-# [b.4] SELECTION OF OUTPUT MATRICES CHARACTERISTICS
+# [b.3] SELECTION OF OUTPUT MATRICES CHARACTERISTICS
 binary_dictionary={True:'-B',False:''}
 BINARY=binary_dictionary[config['binary']]
 
-# [c] WORKFLOW
+# [C] WORKFLOW
 rule all:
     input:
         expand('{output}/adata_{sample}.h5ad', output=OUTPUT_PATH,sample=SAMPLE_NAME)
@@ -98,23 +97,40 @@ rule merge_reads:
 
 
 #1a) Classify each read using its barcode
-rule tag_dust:
-    input:
-        expand('{output}/{sample}_READ{read}.fastq.gz',output=OUTPUT_PATH, sample=SAMPLE_NAME, read=READS)
-    params:
-        output_path=OUTPUT_PATH,
-        prefix=SAMPLE_NAME,
-        list_BCs=','.join(BARCODES),
-        threads=THREADS
-    resources:
-        cpus=8,
-        mem_mb=15000
-    output:
-        expand('{output}/{sample}_logfile.txt',output=OUTPUT_PATH, sample=SAMPLE_NAME),        
-        expand('{output}/{sample}_un_READ{read}.fq',output=OUTPUT_PATH, sample=SAMPLE_NAME, read=READS),        
-        expand('{output}/{sample}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcodes=BARCODES,read=READS)
-    shell:
-        'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.output_path}/{params.prefix} -t {params.threads}'
+if ATAC==True:
+    TN_BARCODES={'tn5':'ATAC'}
+    BARCODES='ATAC'
+    rule skip_tagdust:
+        input:
+            expand('{output}/{sample}_READ{read}.fastq.gz',output=OUTPUT_PATH, sample=SAMPLE_NAME, read=READS)
+        params:
+            output_path=OUTPUT_PATH,
+            prefix=SAMPLE_NAME,
+            barcode=BARCODES
+        output:
+            expand('{output}/{sample}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcodes=BARCODES,read=READS)
+        shell:
+            '''mv {params.output_path}/{params.prefix}_READ1.fastq.gz {params.output_path}/{params.prefix}_BC_{params.barcode}_READ1.fq
+            mv {params.output_path}/{params.prefix}_READ2.fastq.gz {params.output_path}/{params.prefix}_BC_{params.barcode}_READ2.fq
+            mv {params.output_path}/{params.prefix}_READ3.fastq.gz {params.output_path}/{params.prefix}_BC_{params.barcode}_READ3.fq'''
+else:
+    rule tag_dust:
+        input:
+            expand('{output}/{sample}_READ{read}.fastq.gz',output=OUTPUT_PATH, sample=SAMPLE_NAME, read=READS)
+        params:
+            output_path=OUTPUT_PATH,
+            prefix=SAMPLE_NAME,
+            list_BCs=','.join(BARCODES),
+            threads=THREADS
+        resources:
+            cpus=8,
+            mem_mb=15000
+        output:
+            expand('{output}/{sample}_logfile.txt',output=OUTPUT_PATH, sample=SAMPLE_NAME),        
+            expand('{output}/{sample}_un_READ{read}.fq',output=OUTPUT_PATH, sample=SAMPLE_NAME, read=READS),        
+            expand('{output}/{sample}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, sample=SAMPLE_NAME, barcodes=BARCODES,read=READS)
+        shell:
+            'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.output_path}/{params.prefix} -t {params.threads}'
 
 
 #1b) umi_tools
@@ -196,7 +212,7 @@ def tn_id(file):
     elif bc_in in config['barcodes']['tnh']:
         return 'tnh' 
     else:
-        return 'None'
+        return 'ATAC'
 
 rule dedup:
     input:

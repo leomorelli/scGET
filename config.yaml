@@ -12,6 +12,7 @@ input_path: ''
 input_list: ''
 output_path: ''
 binary: False
+atac: False
 tnh: True
 tn5: True
 ...
