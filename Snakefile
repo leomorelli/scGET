@@ -8,7 +8,7 @@ import anndata
 
 abs_path=os.path.abspath('')
 
-
+# [a] SCRIPTS DEFINITION
 spec_u = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
 utilities = importlib.util.module_from_spec(spec_u)
 spec_u.loader.exec_module(utilities)
@@ -21,9 +21,10 @@ spec_l = importlib.util.spec_from_file_location("tn_layers",f"{abs_path}/scripts
 layers = importlib.util.module_from_spec(spec_l)
 spec_l.loader.exec_module(layers)
 
-
+# [b] CONFIG HANDLING
 configfile: f'{abs_path}/config.yaml'
 
+# [b.1] DEFINITION OF TRANSPOSASES AND BARCODES FOR SCGET ANALYSIS
 if config['tn5']!=True:
     TN_BARCODE=config['barcodes']
     TN_BARCODES={'tnh':TN_BARCODE['tnh']}
@@ -36,6 +37,7 @@ else:
     TN_BARCODES=config['barcodes']
     BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
     
+# [b.2] OTHER VARIABLES
 CELL_NUMBER=config['cell_number']  
 SAMPLE= config['sample']
 READS= config['reads']
@@ -45,9 +47,13 @@ INPUT_LIST=config['input_list']
 SAMPLE_NAME=utilities.sample_name(SAMPLE,INPUT_PATH)
 OUTPUT_PATH=utilities.output(config['output_path'],utilities.sample_name(SAMPLE,INPUT_PATH))
 
+# [b.3] ATAC CONFIGURATION (no scGET analysis)
+
+# [b.4] SELECTION OF OUTPUT MATRICES CHARACTERISTICS
 binary_dictionary={True:'-B',False:''}
 BINARY=binary_dictionary[config['binary']]
 
+# [c] WORKFLOW
 rule all:
     input:
         expand('{output}/adata_{sample}.h5ad', output=OUTPUT_PATH,sample=SAMPLE_NAME)
