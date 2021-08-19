@@ -189,7 +189,7 @@ rule index_allignement:
         'samtools index {input}'
 
 # 5) deduplication
-def tn_id(file):
+def tn_id(bc_in):
     if bc_in in config['barcodes']['tn5']:
         return 'tn5'        
     elif bc_in in config['barcodes']['tnh']:
