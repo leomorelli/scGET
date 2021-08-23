@@ -11,9 +11,9 @@ def add_layer(output,sample,tn_dict):
         adata0_5 = adatas_5.pop(0)
         adata0_h = adatas_h.pop(0)
         for ad5 in adatas_5:
-            adata0_5 = adata0_5 + ad5
+            adata0_5.X = adata0_5.X + ad5.X
         for adh in adatas_h:
-            adata0_h = adata0_h + adh
+            adata0_h.X = adata0_h.X + adh.X
         adata0_5.layers['tnh']=adata0_h.X
         adata0_5.layers['tn5']=adata0_5.X
         adata0_5.write(f'{output}/adata_{sample}.h5ad')
@@ -23,5 +23,5 @@ def add_layer(output,sample,tn_dict):
         adatas = [sc.read(f'{output}/{sample}_BC_{bc}.h5ad') for bc in bcs]
         adata0 = adatas.pop(0)
         for ad in adatas:
-            adata0 = adata0 + ad
+            adata0.X = adata0.X + ad.X
         adata0.write(f'{output}/adata_{sample}.h5ad')
