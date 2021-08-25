@@ -23,7 +23,10 @@ spec_l.loader.exec_module(layers)
 
 # [B] CONFIG HANDLING
 configfile: f'{abs_path}/config.yaml'
-    
+
+include: f'{abs_path}/modules/init_lane'  #initialization (handling of input files)
+include: f'{abs_path}/modules/shared_rules' #umi_tools 
+  
 # [b.1] OTHER VARIABLES (no barcode in atac analysis)
 CELL_NUMBER=config['cell_number']  
 SAMPLE= config['sample']
@@ -60,47 +63,15 @@ else:
 
 
 # 0) PREMERGE OF DIFFERENT INPUT FILES
-# 0a) Create a text file where each file is assigned to its read
 
-rule file_read:
-    input:
-        files=utilities.list_of_files(INPUT_PATH,INPUT_LIST),
-    output:
-        temp(expand('{output}/info_READ{read}.txt',output=OUTPUT_PATH,read=READS)),
-    run:
-        info_read=infos.df_info(input)
-        infos.create_read_files(OUTPUT_PATH,info_read)
+# 0a) Create a text file where each file is assigned to its read (rule file_read)
+
+#0b) Rename each file with a tag expressing the number of read (rule merge_reads)
 
 
-#0b) Rename each file with a tag expressing the number of read
-rule merge_reads:
-    input:
-        '{output_path}/info_READ{read}.txt'
-    output:
-        '{output_path}/{sample}_READ{read}.fastq.gz'
-    shell:
-        "cat $(cat {input}) > {output}"
 
-#1) umi_tools
-rule umi_tools:
-    input:
-        '{output}/{sample}_READ2.fastq.gz'
-    params:
-        prefix=SAMPLE_NAME,
-        method='reads',
-        extract_method='string',
-        bc_pattern='CCCCCCCCCCCCCCCC',
-        cell_number=CELL_NUMBER, # 5000 by default
-        subset_reads='10000000000',
-        output_path=OUTPUT_PATH
-    resources:
-        mem_mb=35000
-    output:
-        '{output}/{sample}_whitelist.tsv',
-        '{output}/{sample}_cell_barcode_knee.png',
-        '{output}/{sample}_cell_barcode_counts.png'
-    shell:
-        'umi_tools whitelist --method={params.method} --extract-method={params.extract_method} --bc-pattern={params.bc_pattern} -I {input} -S {params.output_path}/{params.prefix}_whitelist.tsv --plot-prefix={params.output_path}/{params.prefix} --set-cell-number={params.cell_number} --subset-reads={params.subset_reads}'
+#1) umi_tools (shared_rules)
+
 
 #2) allignment
 rule bwa:
