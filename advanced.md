@@ -65,25 +65,12 @@ It is necessary to clarify the path for `scatACC` directory in order to perform 
 This parameter is mandatory for the peak count step. It may be more convenient to modify the `bed_file` parameter directly from the `config.yaml` file.
 ### 7. binary
 If `binary`= False, it enables the selection of output counts over intervals instead of binary data. `binary`= True by default.
-### 8. sample
-Sample name can be clarified thanks to `sample` parameter. If sample name is not indicated, `sample` is equal to the name of the last folder of the `input_path`:
+### 8. tn5 & tnh
 
+### 9. atac
 
-Example:
-
-
-`input_path`= ${HOME}/fastq/clone12 &#8594; `sample`=clone12
-
-
-While if the `input_path` is not indicated (i.e. input files are located in your current folder), `sample`= `scGET_sample` by default.
-
-
-Example:
-
-
-
-`input_path`= '' &#8594; `sample`=scGET_sample
-### 9. output_path
+![img/scget_atac](img/scget_atac.png)
+### 10. output_path
 It indicates where `scGET` results will be stored: resulting files will be stored in a folder named after the sample name.
 
 
