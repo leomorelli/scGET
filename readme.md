@@ -241,7 +241,7 @@ snakemake --cores 8 --config input_path=/home/files/experiment_test output_path=
 ```
 # 7. Output
 Once **scGET** analysis is finished results files as well as log files are generated and stored in the output directory:
-<img src="img/results.png" alt="img/results" width="600"/>
+<img src="img/scget_res.png" alt="img/scget_res" width="600"/>
 - **Results files** are stored in a directory named after the sample name
 - **Log files** are stored in the `logs_slurm` directory, located in the directory, indicated by the `output_path`
 
