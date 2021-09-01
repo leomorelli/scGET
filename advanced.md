@@ -68,7 +68,7 @@ If `binary`= False, it enables the selection of output counts over intervals ins
 ### 8. tn5 & tnh
 
 ### 9. atac
-s
+
 ![img/scget_atac](img/scget_atac.png)
 ### 10. output_path
 It indicates where `scGET` results will be stored: resulting files will be stored in a folder named after the sample name.
