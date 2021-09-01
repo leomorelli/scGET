@@ -48,11 +48,17 @@ It is necessary to clarify the path for `scatACC` directory in order to perform 
 ### 6. bed_file
 This parameter is mandatory for the peak count step. It may be more convenient to modify the `bed_file` parameter directly from the `config.yaml` file.
 ### 7. binary
-If `binary`= False, it enables the selection of output counts over intervals instead of binary data. `binary`= True by default.
+`binary`= False by default:
+- If `binary`= False, it enables the selection of output counts over intervals instead of binary data. 
+- If `binary`= True, matrix counts are binary.
 ### 8. tn5 & tnh
-
+`tn5`= True & `tnh`= True by default.
+If `tn5` or `tnh` = False, the corresponding barcodes are excluded from the analysis.
 ### 9. atac
-
+`atac`= False by default.
+If `atac`= True, the worflow chenges:
+- from the `modules/` folder `atac_wf.smk` is imported in stead of `scget_wf.smk`.
+- `Tagdust` step is no more necessary, since scATAC-seq does not make use of scGET-seq barcodes
 ![img/atac_wf](img/atac_wf.png)
 ### 10. output_path
 It indicates where `scGET` results will be stored: resulting files will be stored in a folder named after the sample name.
