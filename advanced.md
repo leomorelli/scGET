@@ -69,7 +69,7 @@ If `binary`= False, it enables the selection of output counts over intervals ins
 
 ### 9. atac
 
-![img/scget_atac](img/scget_atac.png)
+![img/atac_wf](img/atac_wf.png)
 ### 10. output_path
 It indicates where `scGET` results will be stored: resulting files will be stored in a folder named after the sample name.
 
