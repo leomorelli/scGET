@@ -15,7 +15,7 @@ From these files starts the analysis with `scGET` library.
 # Configuration management
 `scGET` allows the configuration of different parameters. The `config.yaml` file contains the default setting of each parameter. However, each default setting can be configured differently, directly from terminal. Here you can see a visual representation of configurable parameters needed for a personalyzed analysis.
 
-![img/conf_params](img/conf_params.png)
+![img/scget_params](img/scget_params.png)
 
 
 ### 1. input_list
