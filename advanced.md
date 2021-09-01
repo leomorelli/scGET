@@ -20,36 +20,20 @@ From these files starts the analysis with `scGET` library.
 
 ### 1. input_list
 
-
-
-The `input_list` must be a text file. Each line has to indicate the name of one of the fastq files. The `input_list` is accepted in two fromats:
-1. *name_of_the_file* + *read_number*: read numbers are explicitly expressed for each file to each file:
-> sample_S1_L001_R1_001.fastq.gz 1
+The `input_list` must be a text file. Each line has to indicate the name of one of the fastq files. Up to now, the `input_list` is accepted only, using the following format: *name_of_the_file* + *read_number* + *sample_name* must be expressed for each file.
+> sample_S1_L001_R1_001.fastq.gz 1 S1
 > 
-> sample_S1_L001_R2_001.fastq.gz 2
+> sample_S1_L001_R2_001.fastq.gz 2 S1
 > 
-> sample_S1_L001_R3_001.fastq.gz 3
+> sample_S1_L001_R3_001.fastq.gz 3 S1
 > 
-> sample_S1_L002_R1_001.fastq.gz 1
+> sample_S2_L001_R1_001.fastq.gz 1 S2
 > 
-> sample_S1_L002_R2_001.fastq.gz 2
+> sample_S2_L001_R2_001.fastq.gz 2 S2
 > 
-> sample_S1_L002_R3_001.fastq.gz 3
+> sample_S2_L001_R3_001.fastq.gz 3 S2
     
-
-2. *name_of_the_file*: each line of the `input_list` indicates only the name of the file. A simple script will be in charge of searching for the pattern `_R1`,`_R2`, or `_R3` within each file name, in order to assign the number of read:
-> sample_S1_L001_R1_001.fastq.gz 
-> 
-> sample_S1_L001_R2_001.fastq.gz 
-> 
-> sample_S1_L001_R3_001.fastq.gz 
-> 
-> sample_S1_L002_R1_001.fastq.gz 
-> 
-> sample_S1_L002_R2_001.fastq.gz 
-> 
-> sample_S1_L002_R3_001.fastq.gz 
-
+This is necessary in order to enable the simultaneous processing of different samples, using a single command.
 
 ### 2. input_path
 
