@@ -5,7 +5,7 @@ The goal of **s**ingle **c**ell **G**enome and **E**pigenome by **T**ransposases
 scGET architecture is built using `Snakemake`: a workflow management system, which guarantees the possibility to **parallelize** independent jobs. **scGET** workflow is described by the image below: starting from sequenced FASTQ files, **scGET** will generate an `AnnData` object where **tn5 matrix** and **tnh matrix** are present as two different layers.
 
 
- ![img/dag](img/dag.svg)
+ ![img/dag](img/scget_wf.png)
 # 2. Installing scGET
 First, `scGET` repository must be cloned:
 ```
