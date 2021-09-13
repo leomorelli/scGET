@@ -33,7 +33,7 @@ binary_dictionary={True:'-B',False:''}
 BINARY=binary_dictionary[config['binary']]
 
 wildcard_constraints:
-    sample='[a-zA-Z0-9_]'
+    sample='.*[a-zA-Z0-9_]'
 
 # [C] WORKFLOW      
 
