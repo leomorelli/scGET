@@ -32,7 +32,7 @@ rule merge_reads:
     output:
         f'{OUTPUT_PATH}/{{sample}}/{{sample}}_READ{{read}}.fastq.gz'
     wildcard_constraints:
-        sample='[a-zA-Z0-9_]'
+        sample='.*[a-zA-Z0-9_]'
     shell:
         "cat $(cat {input}) > {output}"
 
