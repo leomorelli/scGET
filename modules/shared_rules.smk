@@ -22,7 +22,7 @@ samples_tot=[x.strip() for x in open(f'{INPUT_LIST}').read().split('\n')[:-1]]
 SAMPLES=list(set([x.split(' ')[-1] for x in samples_tot if len(x)>0]))
 
 wildcard_constraints:
-    sample='[a-zA-Z0-9_]'
+    sample='.*[a-zA-Z0-9_]'
 
 #1b) umi_tools
 rule umi_tools:
