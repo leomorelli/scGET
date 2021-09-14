@@ -17,8 +17,8 @@ rule info_text:
     input:
         text=INPUT_LIST
     output:
-        expand('{out}/{samples}/info_{samples}.txt', out=OUTPUT_PATH, samples=SAMPLES),
-        expand('{out}/{samples}/info_READ{read}.txt', out=OUTPUT_PATH, samples=SAMPLES,read=READS)
+        temp(expand('{out}/{samples}/info_{samples}.txt', out=OUTPUT_PATH, samples=SAMPLES)),
+        temp(expand('{out}/{samples}/info_READ{read}.txt', out=OUTPUT_PATH, samples=SAMPLES,read=READS))
     run:
         paral.prep_input(INPUT_LIST,OUTPUT_PATH,INPUT_PATH)
 
@@ -30,7 +30,7 @@ rule merge_reads:
     input:
         f'{OUTPUT_PATH}/{{sample}}/info_READ{{read}}.txt'    
     output:
-        f'{OUTPUT_PATH}/{{sample}}/{{sample}}_READ{{read}}.fastq.gz'
+        temp(f'{OUTPUT_PATH}/{{sample}}/{{sample}}_READ{{read}}.fastq.gz')
     wildcard_constraints:
         sample='.*[a-zA-Z0-9_]'
     shell:

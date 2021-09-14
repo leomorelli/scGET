@@ -23,13 +23,11 @@ def create_dirs(out_path,sample):
 
 #write_info() python function to create files for parallel multisample snakemake initialization
 
-def write_info(out_path,info,sample):                                      # info=information coming from samples, sample=sample name
-    for line in info:
-        with open(f'{out_path}/info_{sample}.txt','a+') as myfile:
+def write_info(out_path,info,sample):                                    
+    with open(f'{out_path}/info_{sample}.txt','a') as myfile:
+        for line in info:                                # info=information coming from samples, sample=sample name
             myfile.write(' '.join(map(str,line))+'\n')
     myfile.close()
-
-
 
 #from a tex file to a list of files where files are classified according to their read number
 
@@ -96,15 +94,11 @@ def create_read_files(path,df):                                        # file na
 #final function
 
 def prep_input(input_file,out_path,input_path):
-    fin=[f.strip() for f in open(input_file).read().split('\n') if len(f)>1]         #the input file for configuration is opened and read
-    lof=[line.split() for line in fin]
-    df=pd.DataFrame(lof, columns=['file','read','name']) # the input file is converted into a pd.DataFrame where sample names are stored in a specific column
-    samples=[x for x in df.loc[:,'name'].unique()]
+    df=pd.read_table(input_file,sep=' ', header=None,names=['file','read','name']) # the input file is converted into a pd.DataFrame where sample names, files names and read numbers are stored in specific columns
+    samples=[x for x in df.loc[:,'name'].unique()]                               
     for smpl in samples:                                  # for each unique sample name a folder will be created containing information for sample analysis
-        files_smpl=df[df.loc[:,'name']==smpl]
-        text=[]
-        for fl in range(len(files_smpl.T)):
-            text.append([files_smpl.T.iloc[x,fl] for x in range(len(files_smpl.T.iloc[:,fl][:-1]))])
+        files_smpl=df.query('name == @smpl')
+        text=[[x[0],x[1]] for x in files_smpl[['file', 'read']].values]
         smpl_path=create_dirs(out_path,smpl)        # create dirs
         write_info(smpl_path,text,smpl)             #write_info()
         lof=list_of_files(input_path,f'{smpl_path}/info_{smpl}.txt')
