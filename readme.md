@@ -83,7 +83,7 @@ vi config.yaml
  - After that, the config.yaml file must be compiled as explained below (remember to update the queue name specified by the ``-p`` option and  your ``mail-user``):
 ```
 jobs: 38
-cluster: "sbatch --mem={resources.mem_mb} -c {resources.cpus} -o {OUTPUT_PATH}/logs_slurm/{rule}.o -e {OUTPUT_PATH}/logs_slurm/{rule}.e --mail-type=FAIL --mail-user=user@mail.com"
+cluster: "sbatch --mem={resources.mem_mb} -c {resources.cpus} --job-name {rule}.smk -o {OUTPUT_PATH}/logs_slurm/{rule}.o -e {OUTPUT_PATH}/logs_slurm/{rule}.e --mail-type=FAIL --mail-user=user@mail.com"
 default-resources: [cpus=1, mem_mb=5000]
 resources: [cpus=40, mem_mb=60000]
 use-conda: true
