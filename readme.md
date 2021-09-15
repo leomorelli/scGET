@@ -86,7 +86,7 @@ jobs: 38
 cluster: "sbatch --mem={resources.mem_mb} -c {resources.cpus} --job-name {rule}.smk -o {OUTPUT_PATH}/logs_slurm/{rule}_%j.o -e {OUTPUT_PATH}/logs_slurm/{rule}_%j.e --mail-type=FAIL --mail-user=user@mail.com"
 default-resources: [cpus=1, mem_mb=5000]
 resources: [cpus=40, mem_mb=60000]
-attempt: 3
+restart-times: 3
 use-conda: true
 ```
 
