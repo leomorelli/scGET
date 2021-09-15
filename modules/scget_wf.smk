@@ -97,7 +97,7 @@ rule bwa:
         threads_samtools=THREADS-6
     resources:
         cpus=8,
-        mem_mb=10000
+        mem_mb=20000
     output:
         '{output}/{sample}/{sample}_BC_{barcode}.bam'
     wildcard_constraints:
