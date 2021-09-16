@@ -70,7 +70,7 @@ rule tag_dust:
         expand('{output}/{{sample}}/{{sample}}_un_READ{read}.fq',output=OUTPUT_PATH, read=READS),        
         expand('{output}/{{sample}}/{{sample}}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, barcodes=BARCODES,read=READS)
     shell:
-        'tagdust -1 B:{params.list_BCs} -2 S:AGATATATATAAGGAGACAG -3 R:N {input} -o {params.output_path}/{wildcards.sample}/{wildcards.sample} -t {params.threads}'
+        'tagdust -1 B:{params.list_BCs} -2 S:AGATGTGTATAAGAGACAG -3 R:N {input} -o {params.output_path}/{wildcards.sample}/{wildcards.sample} -t {params.threads}'
 
 
 #1b) umi_tools (shared_rules)
