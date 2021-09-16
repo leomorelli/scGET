@@ -52,7 +52,7 @@ wildcard_constraints:
 # [C] WORKFLOW
 
 def get_mem_mb_bwa(wildcards, attempt):
-    return attempt * 20000
+    return attempt * 16000
 
 #1a) Classify each read using its barcode
 rule tag_dust:
