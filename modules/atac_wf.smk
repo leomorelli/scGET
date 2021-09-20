@@ -51,7 +51,7 @@ rule bwa:
         threads_samtools=THREADS-6
     resources:
         cpus=8,
-        mem_mb=30000
+        mem_mb=lambda wildcards, attempt: attempt  * 20000
     output:
         '{output}/{sample}/{sample}_aligned.bam'
     shell:
@@ -65,7 +65,7 @@ rule index_alignment:
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=15000
+        mem_mb=lambda wildcards, attempt: attempt  * 15000
     output:
         '{output}/{sample}/{sample}_aligned.bam.bai'
     shell:
@@ -80,7 +80,7 @@ rule dedup:
         indexed_bam='{output}/{sample}/{sample}_aligned.bam.bai'
     resources:
         cpus=8,
-        mem_mb=30000
+        mem_mb=lambda wildcards, attempt: attempt  * 20000
     params:
         tn='atac',
         scatACC_path=config['scatacc_path']
@@ -98,7 +98,7 @@ rule index_dedup:
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=30000
+        mem_mb=lambda wildcards, attempt: attempt  * 20000
     output:
         '{output}/{sample}/{sample}_bcdedup.bam.bai'
     shell:
@@ -122,7 +122,7 @@ rule peak_count:
         binary=BINARY
     resources:
         cpus=8,
-        mem_mb=30000
+        mem_mb=lambda wildcards, attempt: attempt  * 20000
     output:
         '{output}/{sample}/{sample}.h5ad'
     shell:

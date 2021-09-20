@@ -51,9 +51,6 @@ wildcard_constraints:
 
 # [C] WORKFLOW
 
-def get_mem_mb_bwa(wildcards, attempt):
-    return attempt * 16000
-
 #1a) Classify each read using its barcode
 rule tag_dust:
     input:
@@ -64,7 +61,7 @@ rule tag_dust:
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 12000
     output:
         expand('{output}/{{sample}}/{{sample}}_logfile.txt',output=OUTPUT_PATH),        
         expand('{output}/{{sample}}/{{sample}}_un_READ{read}.fq',output=OUTPUT_PATH, read=READS),        
@@ -95,13 +92,13 @@ rule bwa:
         ids=utilities.exp_bc('merged_sample_BC_{barcode}_READ1.fq.gz'),
         center='COSR',
         platform='Illumina',
-        prefix=get_mem_mb_bwa,
+        prefix=20000,
         lib='not_specified',
         threads_bwa=THREADS-2,
         threads_samtools=THREADS-6
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
     output:
         '{output}/{sample}/{sample}_BC_{barcode}.bam'
     wildcard_constraints:
@@ -117,7 +114,7 @@ rule index_alignement:
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
     output:
         '{output}/{sample}/{sample}_BC_{barcode}.bam.bai'
     wildcard_constraints:
@@ -142,7 +139,7 @@ rule dedup:
         indexed_bam='{output}/{sample}/{sample}_BC_{barcode}.bam.bai'
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
     params:
         tn=lambda wildcards: tn_id(wildcards.barcode),
         prefix=lambda wildcards: {wildcards.sample},
@@ -161,7 +158,7 @@ rule index_dedup:
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
     output:
         '{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam.bai'
     shell:
@@ -185,7 +182,7 @@ rule peak_count:
         binary=BINARY
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
     output:
         '{output}/{sample}/{sample}_BC_{barcode}.h5ad'
     shell:
@@ -199,7 +196,7 @@ rule layers:
         sample=lambda wildcards: {wildcards.sample}
     resources:
         cpus=8,
-        mem_mb=get_mem_mb_bwa
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
     output:
         '{output}/{sample}/{sample}.h5ad'
     run:

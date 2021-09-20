@@ -24,8 +24,6 @@ SAMPLES=list(set([x.split(' ')[-1] for x in samples_tot if len(x)>0]))
 wildcard_constraints:
     sample='.*[a-zA-Z0-9_]'
 
-def get_mem_mb_umi(wildcards, attempt):
-    return attempt * 20000
 
 #1b) umi_tools
 rule umi_tools:
@@ -39,7 +37,7 @@ rule umi_tools:
         subset_reads='10000000000',
         output_path=OUTPUT_PATH
     resources:
-        mem_mb=get_mem_mb_umi
+        mem_mb=lambda wildcards, attempt: attempt * 18000
     output:
         '{output}/{sample}/{sample}_whitelist.tsv',
         '{output}/{sample}/{sample}_cell_barcode_knee.png',
