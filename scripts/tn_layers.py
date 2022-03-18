@@ -11,6 +11,7 @@ def add_layer(output,sample,tn_dict):
         adata0_5 = adatas_5.pop(0)
         adata0_h = adatas_h.pop(0)
         cells = adata0_5.obs_names
+        adata0_h = adata0_h[cells]
         for ad5 in adatas_5:
             adata0_5.X = adata0_5.X + ad5[cells].X
             adata0_5.obs['n_regions'] += ad5[cells].obs['n_regions']
