@@ -10,16 +10,15 @@ def add_layer(output,sample,tn_dict):
         adatas_h = [sc.read(f'{output}/{sample}/{sample}_BC_{bc}.h5ad') for bc in bc_tnh]
         adata0_5 = adatas_5.pop(0)
         adata0_h = adatas_h.pop(0)
-        cells_5 = adata0_5.obs_names
-        cells_h = adata0_h.obs_names
+        cells = adata0_5.obs_names
         for ad5 in adatas_5:
-            adata0_5.X = adata0_5.X + ad5[cells_5].X
-            adata0_5.obs['n_regions'] += ad5[cells_5].obs['n_regions']
-            adata0_5.var['n_cells'] += ad5[cells_5].var['n_cells']
+            adata0_5.X = adata0_5.X + ad5[cells].X
+            adata0_5.obs['n_regions'] += ad5[cells].obs['n_regions']
+            adata0_5.var['n_cells'] += ad5[cells].var['n_cells']
         for adh in adatas_h:
-            adata0_h.X = adata0_h.X + adh[cells_h].X
-            adata0_h.obs['n_regions'] += adh[cells_h].obs['n_regions']
-            adata0_h.var['n_cells'] += adh[cells_h].var['n_cells']
+            adata0_h.X = adata0_h.X + adh[cells].X
+            adata0_h.obs['n_regions'] += adh[cells].obs['n_regions']
+            adata0_h.var['n_cells'] += adh[cells].var['n_cells']
         adata0_5.layers['tnh']=adata0_h.X
         adata0_5.layers['tn5']=adata0_5.X
         adata0_5.write(f'{output}/{sample}/{sample}.h5ad')
