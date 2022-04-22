@@ -95,7 +95,9 @@ rule bwa:
         prefix=20000,
         lib='not_specified',
         threads_bwa=THREADS-2,
-        threads_samtools=THREADS-6
+        threads_samtools=THREADS-6,
+        seed_len=19,
+        min_qual=30
     resources:
         cpus=8,
         mem_mb=lambda wildcards, attempt: attempt  * 16000
@@ -104,7 +106,7 @@ rule bwa:
     wildcard_constraints:
         barcode="[A-Z]+"
     shell:
-        'bwa mem -R "@RG\\tID:BC_{params.ids}\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
+        'bwa mem -k {params.seed_len} -T {params.min_qual} -R "@RG\\tID:BC_{params.ids}\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
 
 #4a) indexing alignement
 rule index_alignement:
@@ -169,6 +171,27 @@ rule index_dedup:
 def spl(file):
         name=file
         return name[:-12]
+
+rule bam_metrics:
+    input:
+        bai='{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam.bai',
+        bam='{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam',
+    params:
+        scatACC_path=config['scatacc_path'],
+    output:
+        stats='{output}/{sample}/{sample}_BC_{barcode}_stats.txt',
+    shell:
+        'python {params.scatACC_path}/bam_metrics.py {input.bam} > {output.stats}'
+
+rule merge_metrics:
+    input:
+        expand('{output}/{{sample}}/{{sample}}_BC_{barcode}_stats.txt',output=OUTPUT_PATH, barcode=BARCODES)
+    output:
+        stats='{output}/{sample}/{sample}_stats.txt',
+    params:
+        sample=lambda wildcards: {wildcards.sample}
+    shell:
+        'paste {input} | cut -f1,2,4,6,8,10,12,14,16 > {output.stats}'
 
 rule peak_count:
     input:

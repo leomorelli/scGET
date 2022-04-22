@@ -83,4 +83,8 @@ else:
 # [C] WORKFLOW
 rule all:
     input:
+        expand('{output}/{sample}/{sample}_stats.txt', output=OUTPUT_PATH,sample=SAMPLES),
         expand('{output}/{sample}/{sample}.h5ad', output=OUTPUT_PATH,sample=SAMPLES)
+
+#rule metrics:
+#    input:
