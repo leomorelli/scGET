@@ -9,7 +9,7 @@ scGET architecture is built using `Snakemake`: a workflow management system, whi
 # 2. Installing scGET
 First, `scGET` repository must be cloned:
 ```
-git clone https://github.com/leomorelli/scGET.git
+git clone --recursive https://github.com/leomorelli/scGET.git
 ```
 
 Before getting your hands dirty with scGET analyses, it is necessary to create a suitable conda **environment**. However, some packages cannot be installed, using conda. Therefore, we have designed a 4-step process, allowing an easy and quick generation of the **scget environment**.
@@ -52,7 +52,7 @@ autoconf -Wno-syntax
 make
 make install
 ```
-4. `scatACC` repository must be cloned from github:
+4. `scatACC` repository should be automatically retrieved within the current repository, otherwise it must be cloned from github:
 ```
 git clone https://github.com/dawe/scatACC.git
 ```
@@ -92,13 +92,13 @@ use-conda: true
 
 # 4. Configuration
 
-The path for **scatACC directory**, together with the path for the **genome** and the **bed_file** must be clarified in the `config.yaml` present in the scGET folder.
+The path for **scatACC directory** (should be within the current directory), together with the path for the **genome** and the **bed_file** must be clarified in the `config.yaml` present in the scGET folder.
 
 
 EXAMPLE:
 
 
-Let's assume that the `scGET` directory is located in our home directory (`${HOME}/scGET`); while our **scatACC** directory is situated in a directory called "repositories" (`${HOME}/repositories/scatACC`); on the other hand, the **genome**  file (hg38.fa), lays in the "references" directory (`${HOME}/references/hg.38`), together with the **bed_file** (`${HOME}/references/hg385kbin.bed`):
+Let's assume that the `scGET` directory is located in our home directory (`${HOME}/scGET`); **scatACC** directory is then in a directory `${HOME}/scGET/scatACC`); on the other hand, the **genome**  file (hg38.fa), lays in the "references" directory (`${HOME}/references/hg.38`), together with the **bed_file** (`${HOME}/references/hg385kbin.bed`):
 - First, you should open the `config.yaml` file, in the `scGET` directory:
 ```
 cd ${HOME}/scGET
@@ -119,7 +119,7 @@ Output:
 >
 >cell_number: 5000
 >
->scatacc_path: '${HOME}/scatACC'
+>scatacc_path: '${HOME}/scGET/scatACC'
 >
 >input_path: ''
 >
@@ -146,7 +146,7 @@ Output:
 >
 >cell_number: 5000
 >
->scatacc_path: '${HOME}/**repositories**/scatACC'
+>scatacc_path: '${HOME}/scGET/scatACC'
 >
 >input_path: ''
 >
