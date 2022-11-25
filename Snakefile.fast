@@ -1,0 +1,91 @@
+import gzip
+import os
+import re
+import glob
+import importlib.util
+import scanpy as sc
+import anndata
+
+
+abs_path=os.path.abspath('')
+
+# [A] SCRIPTS IMPORT
+spec_u = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
+utilities = importlib.util.module_from_spec(spec_u)
+spec_u.loader.exec_module(utilities)
+
+spec_l = importlib.util.spec_from_file_location("tn_layers",f"{abs_path}/scripts/tn_layers.py")
+layers = importlib.util.module_from_spec(spec_l)
+spec_l.loader.exec_module(layers)
+
+spec_p = importlib.util.spec_from_file_location("paral_samples",f"{abs_path}/scripts/paral_samples.py")
+paral = importlib.util.module_from_spec(spec_p)
+spec_p.loader.exec_module(paral)
+
+
+
+# [B] CONFIG HANDLING
+configfile: f'{abs_path}/config.yaml'
+
+if config['atac']==True:
+    exp='atac'
+else:
+    exp='scget'
+
+include: f'{abs_path}/modules/init_lane.smk'
+include: f'{abs_path}/modules/shared_rules.smk'
+include: f'{abs_path}/modules/scget_wf.smk.fast'
+#include: f'{abs_path}/modules/{exp}_wf.smk'
+
+# [b.1] DEFINITION OF TRANSPOSASES AND BARCODES FOR SCGET ANALYSIS
+if config['tn5']!=True:
+    TN_BARCODE=config['barcodes']
+    TN_BARCODES={'tnh':TN_BARCODE['tnh']}
+    BARCODES=TN_BARCODES['tnh']
+elif config['tnh']!=True:
+    TN_BARCODE=config['barcodes']
+    TN_BARCODES={'tn5':TN_BARCODE['tn5']}
+    BARCODES=TN_BARCODES['tn5']
+else:
+    TN_BARCODES=config['barcodes']
+    BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
+    
+# [b.2] OTHER VARIABLES
+CELL_NUMBER=config['cell_number']  
+
+INPUT_LIST=config['input_list']
+samples_tot=[x.strip() for x in open(f'{INPUT_LIST}').read().split('\n')[:-1]]
+SAMPLES=list(set([x.split(' ')[-1] for x in samples_tot if len(x)>0]))
+
+READS= config['reads']
+THREADS=config['threads']
+INPUT_PATH=config['input_path']
+INPUT_LIST=config['input_list']
+OUTPUT_PATH=config['output_path']
+# [b.3] SELECTION OF OUTPUT MATRICES CHARACTERISTICS
+binary_dictionary={True:'-B',False:''}
+BINARY=binary_dictionary[config['binary']]
+
+#  create log dir
+log_path = OUTPUT_PATH+"/logs_slurm"
+try:
+    os.mkdir(OUTPUT_PATH+"/logs_slurm")
+    os.mkdir(log_path)
+except OSError:
+    try:
+        os.makedirs(log_path)
+        print("Successfully created the directory %s " % log_path)
+    except OSError:
+        print ("Creation of the directory %s failed" % log_path)
+else:
+    print ("Successfully created the directory %s " % log_path)
+
+
+# [C] WORKFLOW
+rule all:
+    input:
+        expand('{output}/{sample}/{sample}_stats.txt', output=OUTPUT_PATH,sample=SAMPLES),
+        expand('{output}/{sample}/{sample}.h5ad', output=OUTPUT_PATH,sample=SAMPLES)
+
+#rule metrics:
+#    input:

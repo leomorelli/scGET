@@ -1,0 +1,159 @@
+import gzip
+import os
+import re
+import glob
+import importlib.util
+import scanpy as sc
+import anndata
+
+abs_path=os.path.abspath('')
+
+# [A] SCRIPTS IMPORT
+
+spec_u = importlib.util.spec_from_file_location("utility_functions",f"{abs_path}/scripts/utility_functions.py")
+utilities = importlib.util.module_from_spec(spec_u)
+spec_u.loader.exec_module(utilities)
+
+spec_l = importlib.util.spec_from_file_location("tn_layers",f"{abs_path}/scripts/tn_layers.py")
+layers = importlib.util.module_from_spec(spec_l)
+spec_l.loader.exec_module(layers)
+
+# [B] CONFIG HANDLING
+
+# [b.1] DEFINITION OF TRANSPOSASES AND BARCODES FOR SCGET ANALYSIS
+if config['tn5']!=True:
+    TN_BARCODE=config['barcodes']
+    TN_BARCODES={'tnh':TN_BARCODE['tnh']}
+    BARCODES=TN_BARCODES['tnh']
+elif config['tnh']!=True:
+    TN_BARCODE=config['barcodes']
+    TN_BARCODES={'tn5':TN_BARCODE['tn5']}
+    BARCODES=TN_BARCODES['tn5']
+else:
+    TN_BARCODES=config['barcodes']
+    BARCODES=TN_BARCODES['tn5']+TN_BARCODES['tnh']
+    
+# [b.2] OTHER VARIABLES
+CELL_NUMBER=config['cell_number']  
+SAMPLE= config['sample']
+READS= config['reads']
+THREADS=config['threads']
+INPUT_PATH=config['input_path']
+INPUT_LIST=config['input_list']
+OUTPUT_PATH=config['output_path']
+
+# [b.3] SELECTION OF OUTPUT MATRICES CHARACTERISTICS
+binary_dictionary={True:'-B',False:''}
+BINARY=binary_dictionary[config['binary']]
+
+wildcard_constraints:
+    sample='.*[a-zA-Z0-9_]'
+
+# [C] WORKFLOW
+
+#1a) Classify each read using its barcode
+rule tag_dust:
+    input:
+        expand('{output}/{{sample}}/{{sample}}_READ{read}.fastq.gz',output=OUTPUT_PATH, read=READS)
+    params:
+        scatACC_path=config['scatacc_path'],
+        output_path=OUTPUT_PATH,
+        list_BCs=','.join(BARCODES),
+        threads=THREADS
+    resources:
+        cpus=8,
+        mem_mb=lambda wildcards, attempt: attempt  * 12000
+    output:
+        expand('{output}/{{sample}}/{{sample}}_un_READ{read}.fq',output=OUTPUT_PATH, read=READS),        
+        expand('{output}/{{sample}}/{{sample}}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, barcodes=BARCODES,read=READS)
+    shell:
+        'python {params.scatACC_path}/tn_dmx.py -T -1 {input[0]} -2 {input[2]} -b {input[1]} -p {params.output_path}/{wildcards.sample}/{wildcards.sample}'
+
+#1b) umi_tools (shared_rules)
+
+#2a) compress files
+rule compress:
+    input:
+        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq'
+    output:
+        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq.gz'
+    shell:
+        r'gzip {input} {output}'
+
+#3a) alignement
+
+rule chromap:
+    input:
+        '{output}/{sample}/{sample}_BC_{barcode}_READ1.fq.gz',
+        '{output}/{sample}/{sample}_BC_{barcode}_READ2.fq.gz',
+        '{output}/{sample}/{sample}_BC_{barcode}_READ3.fq.gz',
+        '{output}/{sample}/{sample}_whitelist.tsv',
+        genome_index=config['genome_index'],
+        genome_fasta=config['genome_fasta']
+    params:
+        prefix='{sample}_BC_{barcode}',
+        min_read_length=config['read_length'] - 27,
+        threads=THREADS
+    resources:
+        cpus=8,
+        mem_mb=lambda wildcards, attempt: attempt  * 32000
+    output:
+        fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
+        log='{output}/{sample}/{sample}_BC_{barcode}.out'
+    wildcard_constraints:
+        barcode="[A-Z]+"
+    shell:
+        'chromap -t {params.threads} --min-read-length {params.min_read_length} --preset atac -x {input.genome_index} -r {input.genome_fasta} -1 {params.prefix}_READ1.fq.gz -2 {params.prefix}_READ3.fq.gz -b {params.prefix}_READ2.fq.gz --barcode-whitelist {sample}_whitelist.tsv -o {output.fragments} 2> {output.log}'
+
+
+# 7) Peak_count
+
+rule bam_metrics:
+    input:
+        fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
+        log='{output}/{sample}/{sample}_BC_{barcode}.out'
+    params:
+        scatACC_path=config['scatacc_path'],
+    output:
+        stats='{output}/{sample}/{sample}_BC_{barcode}_stats.txt',
+    shell:
+        'python {params.scatACC_path}/stats_chromap.py {input.fragments} {input.log} > {output.stats}'
+
+rule merge_metrics:
+    input:
+        expand('{output}/{{sample}}/{{sample}}_BC_{barcode}_stats.txt',output=OUTPUT_PATH, barcode=BARCODES)
+    output:
+        stats='{output}/{sample}/{sample}_stats.txt',
+    params:
+        sample=lambda wildcards: {wildcards.sample}
+    shell:
+        'paste {input} | cut -f1,2,4,6,8,10,12,14,16 > {output.stats}'
+
+rule peak_count:
+    input:
+        fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
+        whitelist='{output}/{sample}/{sample}_whitelist.tsv',
+        bed=config['bed_file']
+    params:
+        scatACC_path=config['scatacc_path'],
+    resources:
+        cpus=8,
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
+    output:
+        '{output}/{sample}/{sample}_BC_{barcode}.h5ad'
+    shell:
+        'python {params.scatACC_path}/parse_fragments.py -i {input.fragments} -b {input.bed} -o {output} -w {input.whitelist}' 
+
+#8) single anndata with tnh and tn5 layers
+rule layers:
+    input:
+        expand('{output}/{{sample}}/{{sample}}_BC_{barcode}.h5ad',output=OUTPUT_PATH, barcode=BARCODES)
+    params:
+        sample=lambda wildcards: {wildcards.sample}
+    resources:
+        cpus=8,
+        mem_mb=lambda wildcards, attempt: attempt  * 16000
+    output:
+        '{output}/{sample}/{sample}.h5ad'
+    run:
+        layers.add_layer(OUTPUT_PATH,{wildcards.sample}.pop(),TN_BARCODES)
