@@ -92,7 +92,7 @@ rule bwa:
         ids=utilities.exp_bc('merged_sample_BC_{barcode}_READ1.fq.gz'),
         center='COSR',
         platform='Illumina',
-        prefix=20000,
+        prefix='{sample}_{barcode}',
         lib='not_specified',
         threads_bwa=THREADS-2,
         threads_samtools=THREADS-6,
