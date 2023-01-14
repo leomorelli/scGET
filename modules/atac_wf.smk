@@ -80,7 +80,7 @@ rule dedup:
         indexed_bam='{output}/{sample}/{sample}_aligned.bam.bai'
     resources:
         cpus=8,
-        mem_mb=lambda wildcards, attempt: attempt  * 20000
+        mem_mb=lambda wildcards, attempt: attempt  * 100000
     params:
         tn='atac',
         scatACC_path=config['scatacc_path']
@@ -103,6 +103,28 @@ rule index_dedup:
         '{output}/{sample}/{sample}_bcdedup.bam.bai'
     shell:
         'samtools index {input}'
+
+
+rule bam_metrics:
+    input:
+        bai='{output}/{sample}/{sample}_bcdedup.bam.bai',
+        bam='{output}/{sample}/{sample}_bcdedup.bam',
+    params:
+        scatACC_path=config['scatacc_path'],
+    output:
+        stats='{output}/{sample}/{sample}_B_stats.txt',
+    shell:
+        'python {params.scatACC_path}/bam_metrics.py {input.bam} > {output.stats}'
+
+rule merge_metrics:
+    input:
+        st_file='{output}/{sample}/{sample}_B_stats.txt',
+    output:
+        stats='{output}/{sample}/{sample}_stats.txt',
+    params:
+        sample=lambda wildcards: {wildcards.sample}
+    shell:
+        'paste {input.st_file} | cut -f1,2,4,6,8,10,12,14,16 > {output.stats}'
 
 
 # 5) Peak_count
