@@ -56,6 +56,7 @@ rule tag_dust:
     input:
         expand('{output}/{{sample}}/{{sample}}_READ{read}.fastq.gz',output=OUTPUT_PATH, read=READS)
     params:
+        scatACC_path=config['scatacc_path'],
         output_path=OUTPUT_PATH,
         list_BCs=','.join(BARCODES),
         threads=THREADS
@@ -63,12 +64,10 @@ rule tag_dust:
         cpus=8,
         mem_mb=lambda wildcards, attempt: attempt  * 12000
     output:
-        expand('{output}/{{sample}}/{{sample}}_logfile.txt',output=OUTPUT_PATH),        
         expand('{output}/{{sample}}/{{sample}}_un_READ{read}.fq',output=OUTPUT_PATH, read=READS),        
         expand('{output}/{{sample}}/{{sample}}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, barcodes=BARCODES,read=READS)
     shell:
-        'tagdust -1 B:{params.list_BCs} -2 S:AGATGTGTATAAGAGACAG -3 R:N {input} -o {params.output_path}/{wildcards.sample}/{wildcards.sample} -t {params.threads}'
-
+        'python {params.scatACC_path}/tn_dmx.py -T -1 {input[0]} -2 {input[2]} -b {input[1]} -p {params.output_path}/{wildcards.sample}/{wildcards.sample}'
 
 #1b) umi_tools (shared_rules)
 
@@ -83,105 +82,42 @@ rule compress:
 
 #3a) alignement
 
-rule bwa:
+rule chromap:
     input:
-        config['genome'], 
         '{output}/{sample}/{sample}_BC_{barcode}_READ1.fq.gz',
-        '{output}/{sample}/{sample}_BC_{barcode}_READ3.fq.gz'
+        '{output}/{sample}/{sample}_BC_{barcode}_READ2.fq.gz',
+        '{output}/{sample}/{sample}_BC_{barcode}_READ3.fq.gz',
+        '{output}/{sample}/{sample}_whitelist.tsv',
+        genome_index=config['genome_index'],
+        genome_fasta=config['genome_fasta']
     params:
-        ids=utilities.exp_bc('merged_sample_BC_{barcode}_READ1.fq.gz'),
-        center='COSR',
-        platform='Illumina',
-        prefix='{sample}_{barcode}',
-        lib='not_specified',
-        threads_bwa=THREADS-2,
-        threads_samtools=THREADS-6,
-        seed_len=19,
-        min_qual=30
-    resources:
-        cpus=8,
-        mem_mb=lambda wildcards, attempt: attempt  * 16000
-    output:
-        '{output}/{sample}/{sample}_BC_{barcode}.bam'
-    wildcard_constraints:
-        barcode="[A-Z]+"
-    shell:
-        'bwa mem -k {params.seed_len} -T {params.min_qual} -R "@RG\\tID:BC_{params.ids}\\tPL:{params.platform}\\tPU:{params.ids[1]}\\tLB:{params.lib}\\tSM:{params.prefix}\\tCN:{params.center}" -t {params.threads_bwa} {input} |  samtools sort -T {output}_tmp -@ {params.threads_samtools} -o {output}'
-
-#4a) indexing alignement
-rule index_alignement:
-    input:
-        '{output}/{sample}/{sample}_BC_{barcode}.bam'
-    params:
+        prefix='{sample}_BC_{barcode}',
+        min_read_length=config['read_length'] - 27,
         threads=THREADS
     resources:
         cpus=8,
-        mem_mb=lambda wildcards, attempt: attempt  * 16000
+        mem_mb=lambda wildcards, attempt: attempt  * 32000
     output:
-        '{output}/{sample}/{sample}_BC_{barcode}.bam.bai'
+        fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
+        log='{output}/{sample}/{sample}_BC_{barcode}.out'
     wildcard_constraints:
         barcode="[A-Z]+"
     shell:
-        'samtools index {input}'
-
-# 5) deduplication
-def tn_id(bc_in):
-    if bc_in in config['barcodes']['tn5']:
-        return 'tn5'        
-    elif bc_in in config['barcodes']['tnh']:
-        return 'tnh' 
-    else:
-        return 'ATAC'
-
-rule dedup:
-    input:
-        whitelist='{output}/{sample}/{sample}_whitelist.tsv',
-        read2='{output}/{sample}/{sample}_BC_{barcode}_READ2.fq.gz',
-        bamfile='{output}/{sample}/{sample}_BC_{barcode}.bam',
-        indexed_bam='{output}/{sample}/{sample}_BC_{barcode}.bam.bai'
-    resources:
-        cpus=8,
-        mem_mb=lambda wildcards, attempt: attempt  * 16000
-    params:
-        tn=lambda wildcards: tn_id(wildcards.barcode),
-        prefix=lambda wildcards: {wildcards.sample},
-        scatACC_path=config['scatacc_path']
-    output:
-        '{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam'
-    shell:
-        'python {params.scatACC_path}/bc2rg.py -w {input.whitelist} -i {input.read2} -b {input.bamfile} -O -k -G {params.prefix}_{params.tn} | python {params.scatACC_path}/cbdedup.py -I -o {output}'
-        
-
-# 6) indexing dedup files
-rule index_dedup:
-    input:
-        '{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam'
-    params:
-        threads=THREADS
-    resources:
-        cpus=8,
-        mem_mb=lambda wildcards, attempt: attempt  * 16000
-    output:
-        '{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam.bai'
-    shell:
-        'samtools index {input}'
+        'chromap -t {params.threads} --min-read-length {params.min_read_length} --preset atac -x {input.genome_index} -r {input.genome_fasta} -1 {params.prefix}_READ1.fq.gz -2 {params.prefix}_READ3.fq.gz -b {params.prefix}_READ2.fq.gz --barcode-whitelist {sample}_whitelist.tsv -o {output.fragments} 2> {output.log}'
 
 
 # 7) Peak_count
-def spl(file):
-        name=file
-        return name[:-12]
 
 rule bam_metrics:
     input:
-        bai='{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam.bai',
-        bam='{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam',
+        fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
+        log='{output}/{sample}/{sample}_BC_{barcode}.out'
     params:
         scatACC_path=config['scatacc_path'],
     output:
         stats='{output}/{sample}/{sample}_BC_{barcode}_stats.txt',
     shell:
-        'python {params.scatACC_path}/bam_metrics.py {input.bam} > {output.stats}'
+        'python {params.scatACC_path}/stats_chromap.py {input.fragments} {input.log} > {output.stats}'
 
 rule merge_metrics:
     input:
@@ -195,21 +131,18 @@ rule merge_metrics:
 
 rule peak_count:
     input:
-        bai='{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam.bai',
-        bam='{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam',
+        fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
+        whitelist='{output}/{sample}/{sample}_whitelist.tsv',
         bed=config['bed_file']
     params:
-        out=spl('{output}/{sample}/{sample}_BC_{barcode}_bcdedup.bam'),
-        threads=THREADS,
         scatACC_path=config['scatacc_path'],
-        binary=BINARY
     resources:
         cpus=8,
         mem_mb=lambda wildcards, attempt: attempt  * 16000
     output:
         '{output}/{sample}/{sample}_BC_{barcode}.h5ad'
     shell:
-        'python {params.scatACC_path}/para_count.py -p {input.bed} -b {input.bam} -o {params.out} -t {params.threads} {params.binary}'
+        'python {params.scatACC_path}/parse_fragments.py -i {input.fragments} -b {input.bed} -o {output} -w {input.whitelist}' 
 
 #8) single anndata with tnh and tn5 layers
 rule layers:

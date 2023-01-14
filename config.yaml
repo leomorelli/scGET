@@ -3,8 +3,13 @@
 sample: ''
 reads: [1,2,3]
 barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
-genome: /beegfs/scratch/ric.cosr/cittaro.davide/CRUK_AIRC_Accelerator/210129_A00626_0234_BHWC35DMXX/scGET/genomes/hg38.fa
+genome: 
 bed_file: /beegfs/scratch/ric.cosr/cittaro.davide/Ref/hg38_5kbin.gc.bed
+read_length: 50
+genome_index: ''
+genome_fasta: '' 
+genome: ''
+bed_file: ''
 threads: 8
 cell_number: 5000
 scatacc_path: /beegfs/scratch/ric.cosr/cittaro.davide/src/scatACC
