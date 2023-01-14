@@ -84,15 +84,15 @@ rule compress:
 
 rule chromap:
     input:
-        '{output}/{sample}/{sample}_BC_{barcode}_READ1.fq.gz',
-        '{output}/{sample}/{sample}_BC_{barcode}_READ2.fq.gz',
-        '{output}/{sample}/{sample}_BC_{barcode}_READ3.fq.gz',
-        '{output}/{sample}/{sample}_whitelist.tsv',
+        r1='{output}/{sample}/{sample}_BC_{barcode}_READ1.fq.gz',
+        rb='{output}/{sample}/{sample}_BC_{barcode}_READ2.fq.gz',
+        r2='{output}/{sample}/{sample}_BC_{barcode}_READ3.fq.gz',
+        whitelist='{output}/{sample}/{sample}_whitelist.tsv',
         genome_index=config['genome_index'],
         genome_fasta=config['genome_fasta']
     params:
         prefix='{sample}_BC_{barcode}',
-        min_read_length=config['read_length'] - 27,
+        min_read_length=min(30, config['read_length'] - 27),
         threads=THREADS
     resources:
         cpus=8,
@@ -103,7 +103,7 @@ rule chromap:
     wildcard_constraints:
         barcode="[A-Z]+"
     shell:
-        'chromap -t {params.threads} --min-read-length {params.min_read_length} --preset atac -x {input.genome_index} -r {input.genome_fasta} -1 {params.prefix}_READ1.fq.gz -2 {params.prefix}_READ3.fq.gz -b {params.prefix}_READ2.fq.gz --barcode-whitelist {sample}_whitelist.tsv -o {output.fragments} 2> {output.log}'
+        'chromap -q 0 -t {params.threads} --min-read-length {params.min_read_length} --preset atac -x {input.genome_index} -r {input.genome_fasta} -1 {input.r1} -2 {input.r2} -b {input.rb} --barcode-whitelist {input.whitelist} -o {output.fragments} 2> {output.log}'
 
 
 # 7) Peak_count
