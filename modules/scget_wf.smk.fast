@@ -76,7 +76,7 @@ rule tag_dust:
 #    input:
 #        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq'
 #    output:
-        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq.gz'
+#        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq.gz'
 #    shell:
 #        r'gzip {input} {output}'
 
