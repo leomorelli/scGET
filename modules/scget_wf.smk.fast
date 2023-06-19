@@ -64,21 +64,21 @@ rule tag_dust:
         cpus=8,
         mem_mb=lambda wildcards, attempt: attempt  * 12000
     output:
-        expand('{output}/{{sample}}/{{sample}}_un_READ{read}.fq',output=OUTPUT_PATH, read=READS),        
-        expand('{output}/{{sample}}/{{sample}}_BC_{barcodes}_READ{read}.fq',output=OUTPUT_PATH, barcodes=BARCODES,read=READS)
+        expand('{output}/{{sample}}/{{sample}}_un_READ{read}.fq.gz',output=OUTPUT_PATH, read=READS),        
+        expand('{output}/{{sample}}/{{sample}}_BC_{barcodes}_READ{read}.fq.gz',output=OUTPUT_PATH, barcodes=BARCODES,read=READS)
     shell:
         'python {params.scatACC_path}/tn_dmx.py -T -1 {input[0]} -2 {input[2]} -b {input[1]} -p {params.output_path}/{wildcards.sample}/{wildcards.sample}'
 
 #1b) umi_tools (shared_rules)
 
 #2a) compress files
-rule compress:
-    input:
-        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq'
-    output:
-        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq.gz'
-    shell:
-        r'gzip {input} {output}'
+#rule compress:
+#    input:
+#        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq'
+#    output:
+#        '{output}/{sample}/{sample}_BC_{barcode}_READ{read}.fq.gz'
+#    shell:
+#        r'gzip {input} {output}'
 
 #3a) alignement
 
