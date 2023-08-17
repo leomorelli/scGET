@@ -3,20 +3,20 @@
 sample: ''
 reads: [1,2,3]
 barcodes: {'tn5':['CGTACTAG','TCCTGAGC','TCATGAGC','CCTGAGAT'],'tnh':['TAAGGCGA','GCTACGCT','AGGCTCCG','CTGCGCAT']}
-genome: 
+genome: ## PATH TO BWA GENOME 
 bc_pattern: CCCCCCCCCCCCCCCC
-bed_file: /beegfs/scratch/ric.cosr/cittaro.davide/Ref/hg38_5kbin.gc.bed
+bed_file: ##PATH TO PEAKS/INTERVALS BED FILE
 read_length: 50
-genome_index: ''
-genome_fasta: '' 
+genome_index: ## PATH TO CHROMAP GENOME INDEX
+genome_fasta: ## PATH TO GENOME FASTA
 genome: ''
 bed_file: ''
 threads: 8
 cell_number: 5000
-scatacc_path: /beegfs/scratch/ric.cosr/cittaro.davide/src/scatACC
-input_path: /beegfs/scratch/ric.cosr/cittaro.davide/CRUK_AIRC_Accelerator/210129_A00626_0234_BHWC35DMXX/scGET
+scatacc_path: ## PATH TO scatACC sources
+input_path: ## PATH TO BASEDIR FOR ALL THE ANALYSIS
 input_list: input_files.txt
-output_path: /beegfs/scratch/ric.cosr/cittaro.davide/CRUK_AIRC_Accelerator/210129_A00626_0234_BHWC35DMXX/scGET/results
+output_path: ## PATH TO OUTPUT DIR
 binary: False
 tnh: True
 tn5: True
