@@ -11,12 +11,15 @@ abs_path=os.path.abspath('')
 # PARAMS NEEDED
 
 CELL_NUMBER=config['cell_number']
+#BC_PATTERN=config['bc_pattern']
 SAMPLE= config['sample']
 READS= config['reads']
 THREADS=config['threads']
 INPUT_PATH=config['input_path']
 INPUT_LIST=config['input_list']
 OUTPUT_PATH=config['output_path']
+BC_PATTERN=config['bc_pattern']
+
 
 samples_tot=[x.strip() for x in open(f'{INPUT_LIST}').read().split('\n')[:-1]]
 SAMPLES=list(set([x.split(' ')[-1] for x in samples_tot if len(x)>0]))
@@ -32,7 +35,7 @@ rule umi_tools:
     params:
         method='reads',
         extract_method='string',
-        bc_pattern='CCCCCCCCCCCCCCCC',
+        bc_pattern=BC_PATTERN, #'CCCCCCCCCCCCCCCC',
         cell_number=CELL_NUMBER, # 5000 by default
         subset_reads='10000000000',
         output_path=OUTPUT_PATH

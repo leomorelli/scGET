@@ -51,6 +51,7 @@ else:
     
 # [b.2] OTHER VARIABLES
 CELL_NUMBER=config['cell_number']  
+BC_PATTERN='CCCCCCCCCCCCCCCC'
 
 INPUT_LIST=config['input_list']
 samples_tot=[x.strip() for x in open(f'{INPUT_LIST}').read().split('\n')[:-1]]

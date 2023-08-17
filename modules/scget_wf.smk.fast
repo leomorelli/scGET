@@ -101,7 +101,7 @@ rule chromap:
         fragments='{output}/{sample}/{sample}_BC_{barcode}.bed',
         log='{output}/{sample}/{sample}_BC_{barcode}.out'
     wildcard_constraints:
-        barcode="[A-Z]+"
+        barcode="[ACGT]+"
     shell:
         'chromap -q 0 -t {params.threads} --min-read-length {params.min_read_length} --preset atac -x {input.genome_index} -r {input.genome_fasta} -1 {input.r1} -2 {input.r2} -b {input.rb} --barcode-whitelist {input.whitelist} -o {output.fragments} 2> {output.log}'
 
