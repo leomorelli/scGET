@@ -1,3 +1,4 @@
 [submodule "scatACC"]
 	path = scatACC
 	url = https://github.com/dawe/scatACC
+	branch = master
