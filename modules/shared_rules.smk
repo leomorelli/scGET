@@ -47,6 +47,6 @@ rule umi_tools:
         '{output}/{sample}/{sample}_cell_barcode_counts.png'
     shell:
         """
-        umi_tools whitelist --method={params.method} --extract-method={params.extract_method} --bc-pattern={params.bc_pattern} -I {input.file} -S {params.output_path}/{wildcards.sample}/{wildcards.sample}_whitelist_full.tsv --plot-prefix={params.output_path}/{wildcards.sample}/{wildcards.sample} --set-cell-number={params.cell_number} --subset-reads={params.subset_reads}'
+        umi_tools whitelist --method={params.method} --extract-method={params.extract_method} --bc-pattern={params.bc_pattern} -I {input.file} -S {params.output_path}/{wildcards.sample}/{wildcards.sample}_whitelist_full.tsv --plot-prefix={params.output_path}/{wildcards.sample}/{wildcards.sample} --set-cell-number={params.cell_number} --subset-reads={params.subset_reads}
         awk '$1 !~ /N/' {params.output_path}/{wildcards.sample}/{wildcards.sample}_whitelist_full.tsv > {params.output_path}/{wildcards.sample}/{wildcards.sample}_whitelist.tsv
         """
